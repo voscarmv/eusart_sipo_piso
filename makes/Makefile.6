@@ -1,0 +1,47 @@
+libdir = ./bin/lib
+bindir = ./bin/bin
+incdir = ./bin/include
+
+src_libdir = ./src/lib
+src_bindir = ./src/bin
+src_incdir = ./src/include
+
+objects := ${libdir}/set_ports.o ${libdir}/mv_w_tx.o ${libdir}/mv_rx_w.o \
+${libdir}/mv_w_sipo.o ${libdir}/mv_piso_w.o \
+${libdir}/set_anselh_ansel.o ${libdir}/set_pinout_tris.o \
+${libdir}/set_eusart_19200.o
+
+includes := ${incdir}/config.inc ${incdir}/signals.inc
+
+output = ${bindir}/sipo_piso.hex
+script = /usr/share/gputils/lkr/16f690.lkr
+
+vpath %.inc ${src_incdir}
+vpath %.asm ${src_libdir}
+
+# ${output} : ${bindir}/main.o ${objects}
+# 	gplink -m -o ${@} -s ${script} ${^}
+${output} : ${bindir}/main.o ${libdir}/libsp.a
+	gplink -m -o ${@} -s ${script} ${^}
+
+${bindir}/main.o : ${src_bindir}/main.asm ${includes}
+	gpasm -c -o ${@} -I${src_incdir} ${<}
+
+${objects} : ${libdir}/%.o : %.asm
+	gpasm -c -o ${@} -I${src_incdir} ${<}
+
+${includes} : ${incdir}/%.inc : %.inc
+	cp ${<} ${@}
+
+sim :
+	test -e ${bindir}/sipo_piso.cod && gpsim -L. -pp16f690 -s ${bindir}/sipo_piso.cod
+
+clean :
+	rm ${libdir}/* ${incdir}/* ${bindir}/*
+
+${libdir}/libsp.a : ${objects}
+	test -e ${@} || gplib -c ${@} ${^}
+	test -e ${@} && gplib -r ${@} ${?}
+
+# libsp.a : libsp.a(${objects})
+#	gplib -cr ${@} ${?}

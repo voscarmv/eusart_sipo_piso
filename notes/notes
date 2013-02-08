@@ -1,0 +1,434 @@
+Tue Jan 15 17:24:58 CST 2013
+debug.asm and debug.sh are examples for debugging in gpsim. The asm contains an example
+assembly code for microchip PIC16F690 which shows how to use the "embedded commands"
+feature from gputils. The sh shows the proper way  to compile an asm to use the "embedded 
+commands" feature.
+In order to be able to use "embedded commands", the code has to be assembled using the
+"relocatable code" mode. Embedded commands are dealt with in the official gpsim manual,
+chapters 4 and 5, whereas embedded code can be learned in lesson 16 from PIC ELMER's
+160 course lessons, by John McDonough.
+Some references:
+	http://gpsim.sourceforge.net/#docs
+	http://amqrp.org/elmer160/lessons/
+	http://gputils.sourceforge.net/reloc_howto.html
+Wed Jan 16 14:58:14 CST 2013
+File notdebug.asm shows an example of a not-relocatable code, not-embedded-commands-
+camaple homologue of debug.asm. The difference between notdebug.asm and debug.asm is
+stored in notdebug_debug.diff, and is the result of
+	diff notdebug.asm debug.asm
+Apparently, only two lines are needed to give a Microchip ASM file the capability of
+running gpasm embedded commands:
+	include "coff.inc"
+	org	0x00
+And special compilation, using the appropriate .lkr file:
+	gpasm -pp16f690 -c ${1}
+	gplink -m -c -s /usr/share/gputils/lkr/16f690.lkr -o ${1}.a ${1}.o
+Ofcourse, it would be nicer to have a separate relocatable library, instead of just one
+large relocatable monolithic code. And functions, which would take arguments, with which
+the outputs and inputs are directed, e.g.:
+	mv_w_ser PORTA | PORTB | PORTC
+Ofcourse, that would make no sense if there is no previous fixed config. Perhaps the
+previous config could ALSO be in some separte library.
+	- A library to configure ports
+	- A library to configure internal EUSART
+	- A library with I/O functions which work under these configs
+I still don't have enough experience to see what is possible using relocatable code, but
+we'll see if my expectations are either met, unsatisfied, or exceeded.
+Sat Jan 19 12:25:36 CST 2013
+Lesson 16 mentions these few, most frequently used, PIC directives, used for creating
+relocatable code. These may also be used for creating libraries:
+	extern
+	global
+	code
+	udata
+	udata_ovr
+	res
+There are more directives used for creating relocatable code, but they are seldom used:
+	udata_shr
+	idata
+	data
+Also, the special code segment name STARTUP is algo important:
+	STARTUP
+Lesson 16 teaches how to create libraries using MPASM, a proprietary software from Micro-
+chip. There exists a HOWTO for creating Microchip PIC libraries and relocatable code, using
+gputils:
+	http://gputils.sourceforge.net/reloc_howto.html
+So far, my expectations have been met. After reading Lesson 16 and the reloc_howto.html
+doc, It seems that all previously set goals are achieveable. One thing remains: a quick
+crash course on the 'make' utility, to be able to create a more complete, gnu-based,
+microchip project.
+Mon Jan 21 10:34:02 CST 2013
+References about how to use make can be found in "Make: a program for directing
+recompilation". Read the section "How to read this book", for instrucions on taking a
+self-taught crash course.
+The directory 'template' shows a suggested structure for the new sipo_piso ASM project.
+Sun Jan 27 14:07:15 CST 2013
+The command 'gplib' is used for creating microchip libraries, thus:
+	gplib -c math.a mult.o add.o sub.o exp.o
+More information can be found in the gpasm reloc howto.
+The traditional C library naming convention should be used for creating these libs:
+	LIBNAME=x
+	ARCHIVE=lib${LIBNAME}.a
+This standard is discussed further in 'An Introduction to GCC - for GNU Compilers gcc
+and g++', Chapter 2, section 2.6 (see the use of -l option in gnu's gcc).
+The communication protocols should include a handshake. Here are some ideas:
+	1. Both Interface and Control open their input buffers. Interface's buffer is but
+	one byte long, whereas Control's is rather large; it is safe to assume that it is
+	at least 256 bytes long. Still: test should be made to measure the exact size of
+	Control's buffer.
+	Anyway: After opening these buffers, they should both start yelling "Hey!, Hey!,
+	Hey!, Hey!, ..." at eachother, at fixed intervals.
+	Only once they both have received the 'Hey!' signal in their input buffers, do
+	they continue with the next phase of communication.
+	Once Control receives the "Hey!" signal, it stops yelling "Hey!" at Interface,
+	and answers "What?". So does Control.
+	Both Control and Interface start life doing the "Hey!" thing. An appropriate
+	algorithm for this would be something like:
+		while INBYTE is not "Hey!"
+			yell "Hey!"
+		yell "What?"
+	2. Program network structure.
+		a) Probing with timeout
+	There are 4 positions:
+		C	I
+	0 0	barf	barf
+	0 1	barf	drink
+	1 0	drink	barf
+	1 1	drink	drink
+		So, these guys always wanna be drinkin' Not barfing. Sorry yall.
+		All of these positions diserve a different course of action.
+		That means: 4 directives are necessary.
+		0 0
+		Control's output is lost
+		Control's input is lost
+		Interface's output is lost
+		Interface's input is lost
+		0 1
+		Control's output 
+It makes no sense to describe it in those terms. Each half has two channels:
+	/	Control's input
+	C		It can either be lonely
+	T		Or have company.
+	|	Control's output
+	|		It could be making company
+	\		It could be stalling.
+	/	Interface's input
+	I		It could be lonley
+	F		It may not be
+	|	Interface's output
+	|		It could be making company
+	\		It could be stalling.
+It is a tree of 4 branches, with 2 branches each. From the first 4, 2 belong to Control
+and 2 belong to Interface
+Octal
+  /			Control's input
+ /	0	000		Receiving
+C	1	001		No input
+T			Control's output
+ \	2	010		Sending
+  \	3	011		No output
+
+  /			Interface's input
+ /	4	100		Receiving
+I	5	101		No input
+F			Interface's output
+ \	6	110		Sending
+  \	7	111		No output
+Mon Jan 28 23:41:04 CST 2013
+There are really only four interesting possibilities, actually:
+	0.	There is no data transfer between Control TX and Interface RX
+		There is no data transfer between Interface TX and Control RX
+	1.	There is data transfer in node CTX-IRX
+		There is NO data transfer in node ITX-CRX
+	2.	There is NO data transfer in node CTX-IRX
+		This is data transfer in node ITX-CRX
+	3.	There is data transfer in both CTX-IRX and ITX-CRX
+There are 4 circuit terminals of interest:
+	A.	CTX (Control Transmit)
+	B.	CRX (Control Receive)
+	C.	ITX (Interface Transmit)
+	D.	IRX (Interface Receive)
+Nodes AD and CB are important. They can be either working, or down. Only if both are working
+does the exit status become 0:
+	NODES: 1=working, 0=down
+	AD	CB
+	CTX-IRX	ITX-CRX	EXIT
+	0	0	1
+	0	1	1
+	1	0	1
+	1	1	0
+An exit status of 0 indicates a fully functional link between Control and Interface.
+Each, C and I, must ask these questions:
+	1. Did the other side receive my output? Verify this.
+	2. Was I able to receive input from the other side? Verify this as well.
+A typical loop-back test should suffice in either case.
+There is going to be no daemon, waiting for Interface from inside the PC. Interface may be
+physically connected to the PC, and yet, condition AD&&CB may be unfulfilled.
+This would be due to the absence of Control, which is a process that comes in and out of
+existence at random intervals during a communications session.
+Make the greeting protocol optional.
+Suggested loopback check algorithm:
+	1. Send special loopback signal
+	2. Check if it bounced, with timeout
+	3. Wait for loopback signal with timeout
+	4. If received loopback signal, then bouce back
+So, probably, it's possible to quickly model this in bash. Thus:
+	func waitforecho()
+	func senddistress()
+	func makeecho()
+	func waitfordistress()
+Make /usr/local/games/bom such that, at the very end, help_msg is changed for
+	help_msg_${FNAME}
+Thu Jan 30 09:06:56 CST 2013
+There are two ways to write a bash timeout. One by Seebach, the other by Blinn.
+Thu Jan 31 09:07:37 CST 2013
+The Seebach way is actually taken from one Alan Barrett. Look into that.
+This is the Barrett way:
+	
+The Blinn way, goes like this:
+	Portable shell programming, an extensive collection of bourne shell scripts
+		Interacting with users
+		Read with a Time-out
+		Page 110
+Basically, what is needed, is two equivalent processes. One for Control, written in bash
+(and later in C), and another one for the PIC, written for gpasm.
+Control's process would consist on the following algorithm:
+	1. If CTX-CRX flag is unset, send distress signal to I, and go to 2.
+		Otherwise, go to 5.
+	2. Wait for response signal, with a timeout.
+	3. If response is received within time, set CTX-CRX flag,
+		and send confirmation to I, so that I may set it's 
+		own CTX-CRX flag.
+		Otherwise, continue to 4.
+
+NOTE: Here, it is possible that C will receive undesired input from I (such as a distress
+signal instead of a response signal). It would be much simpler to just ignore such undesired
+input, than to write code to handle them. Although, such code may result useful...
+
+	4. If ITX-IRX is unset, wait for distress signal from I, with a timeout, and
+		go to 5. Otherwise, go to 7
+	5. If distress signal is received within time, send response to I.
+	6. Wait for confirmation signal, to ensure that I has set it's ITX-IRX flag
+		If confitrmation is received, set the ITX-IRX flag.
+		Otherwise, go to 7
+	7. If both CTX-CRX and ITX-IRX flags are set, goto 8. Else, go to 1.
+	8. Break loop.
+It is simple to implement such an algoritm in bash, maybe not so simple in C. In C, and in
+ASM, the "timeout", may be substituted by continuous "check" function, which "looks" to see
+if something has been received in a given one-byte "RX-register". This "looking" must
+repeat itself several times, in each "receiving" instance, before continuing.
+Such a "looking" function, exists for the 16F690 instructions set, namely:
+	btfss PIR1,5
+But: is there such a function in C? Perhaps termios and unistd (see man temios ;
+man unistd) have it. Check that.
+Thu Jan 31 18:33:29 CST 2013
+Ok, ok, I think I got it: There could be a background process somewhere that hangs until
+1 byte is extracted from a FIFO, and when the byte is extracted, sets some environment
+flag, to indicate that there is 1 byte waiting, in some variable or something. This can
+be used to emulate the btfss PIR1,5 command, in bash.
+Fri Feb  1 09:54:39 CST 2013
+There are 2 buffers:
+	1. Direct input
+	2. Counted input
+A middle-man process (which receives input from buffer 1, increases a register by 1 for each
+byte received, and outputs those counted bytes into buffer 2), provides a way of knowing
+the  maximum amount of bytes it is possible to extract from buffer 2. Middle-man must
+always be running in background, at least for as long as buffer 1 remains open.
+This makes it unnecessary to use timeouts, or to check several time for the availability
+of a response or confirmation byte. The check can be done once:
+	if $BYTECTR > 0 && ( $BYTE == RESP || $BYTE == CONF ) ; then
+		set corresponding flag (either RESP or CONF)
+That's how it would work. It isn't even necessary to use 2 different processes to "wait"
+for distress, confirm or response signals... maybe. Maybe a single 'case' statement will
+do:
+	case $SIGNAL in
+		$RESP)
+			FLAGRESP=:
+	;;	$CONF)
+			FLAGCONF=:
+	;;	$DIST)
+			FLAGDIST=:
+	;;
+	esac
+If $SIGNAL is a null string, that is due to the fact that BYTECOUNT is 0. Middle-man (or,
+function byte_counter, or whatever) returns a null string on BYTECOUNT=0, so checking for
+BYTECOUNT is unnecessary.
+Since the output value of buffer 2 may be any of 256 bytes, the null string value consti-
+tutes a 257th possible value. It may be used as a delimiter, or to indicate when buffer 2
+is empty.
+This could be implemented in bash_IPC (github.com/vomv1988/bash_IPC.git), as a branch, or,
+preferably, as an improvement for a new commit.
+Fri Feb  1 11:42:43 CST 2013
+For now, it is enough to know how the new Control process is to be written. It is more
+important now to write the ASM library, based on the information generated above.
+This ASM library is part of the implementation of Interface (Control's bestest friend :D)
+Corrections must be made on the "met expectations" from Jan 15, 2013:
+	1. In assy, library functions which take arguments are not possible. What IS, though
+		is to produce macros, with substitutable arguments. But that only runs
+		in the preprocessor, not during PIC code execution.
+		To compansate this, the classic use of WREG is in order.
+	2. To include configuration routines, the use of
+			include <file.inc>
+		...is recommended.
+Sat Feb  2 20:00:32 CST 2013
+There are several important boolean values for the asm files of Interface.
+	ITX_IRX_FLAG
+		If the TX-RX circuit test from Interface is successful, this is set.
+		Otherwise, it is unset.
+	RESPONSE_PENDING
+		This is set only if Interface is expecting a response for their distress
+		signal.
+	CONFIRM_PENDING
+		This is set only if Interface is expecting a confirmation that the
+		CTX_CRX_FLAG boole has been set on Control's side.
+The idea is to:
+	1. Send a distress byte from Interface to the exterior
+	2. Set the RESPONSE_PENDING flag
+		set DISTRESS_PENDING=1 flag
+	3. See if there is input (only 1 byte)
+		3.1. If there is input, check the byte value against a case statement
+			3.1.1. If byte is a response signal, check if RESPONSE_PENDING
+				is set.
+				3.1.1.1. RESPONSE_PENDING=1, Set the ITX_IRX_FLAG.
+					set RESPONSE_PENDING=0
+			3.1.2. If the byte is a confirm signal, check CONFIRM_PENDING
+				3.1.2.1. CONFIRM_PENDING=1, then set CTX_CRX_FLAG
+					set CONFIRM_PENDING=0
+			3.1.3. It is a distress signal. Check DISTRESS_PENDING
+				3.1.3.1. DISTRESS_PENDING=1, send response,
+					set DISTRESS_PENDING=0
+					set CONFIRM_PENDING=1
+	4. If ITX_IRX_FLAG & CTX_CTX_FLAG, then skip 5. Else, go to 5.
+	5. Go to 3
+Sun Feb  3 05:29:37 CST 2013
+There are 3 more algorithms needed:
+	1. One for clearing the SIPOs, reading N bytes, asking for more bytes, and if more
+		are 0, then dump all shifted-into-SIPO bytes.
+	2. One for loading all PISOs, sending N bytes, asking if more, and if more is
+		zero, then respond with prompt.
+	3. One for starting a loopback session with SIPO daisychain, where 1 byte is pushed
+		into the SIPO, and the byte that pops from the shifting, is sent bach to
+		Control. And so on, until N bytes is zero.
+	4. Same as 3, but with PISO.
+The model to follow, consists of prompt selecting. Or, many embedded case statements.
+After the greeting, there begins a different technique for communicating. In the greeting,
+both Control and Interface send distress signals at fixed intervals, and check for their
+corresponding input buffer. They check to see if a single byte (or more, in Control's case)
+has arrived at their virtual inbox (their buffers). If there are bytes, they process them. 
+Otherwise, they send another distress signal. This "check inbox" type of communication seems
+to be useful for continuous probing, but the "wait for input" scheeme seems more fit for
+the rest ofthe program.
+In "wait for input" mode, both, Interface and Control, behave as shells. Interface has to
+send Control the prompt type. Interface prompts for commands, and values. These prompts
+are embedded, and they work as follows:
+	1. Send Control the prompt type. (Command prompt)
+	2. Execute read loop ( btfss PIR1,5 ... )
+	3. After input received, choose function from case statement
+	4. Send control the prompt type. (Value prompt)
+	5. If another value is needed, go back to 4. Otherwise, continue.
+		(Control should now which values each Command requires.)
+		(Byt just in case it doesn't, the code should handle gracefully)
+	6. Execute code with values obtained from 4.
+	7. Steps 1 through 8 may be recursively embedded here
+		(one or more times, with a "step 6" inbetween, etc.)
+	8. Execute code with values obtained from 4.
+That is to say that, a command prompt, usually starts with a couple of value prompts, then
+uses these extracted values for something, and then, maybe starts a sub-command prompt, which in turn prompts for values, etcetera.
+Selecting a command implies starting a limited length session, at the end of which, the
+question is asked: Extend, or end? The length is selected by Control at the beginning of
+each command, and it can either represent a limit in input, or output. This implies that
+commands can be either input commands or output commands, since a command with an input
+stage and an output stage is nothing but a command with an input command and then an out
+put command, etcetera.
+Sun Feb  3 12:58:33 CST 2013
+Maybe some commands should have input/output functions. For example, the loopback commands,
+which send Control 1 byte for each byte Control sends 1 byte, until N bytes are sent from
+Control.
+Sun Feb  3 21:12:19 CST 2013
+The following physical terminals are needed in the PIC:
+	a) For SIPO daisychain:
+		1.	Serial data output.
+		2.	Clock output.
+		3.	Load output.
+		4.	Clear output.
+		5.	Serial data input. (For loopback)
+	b) For PISO daisychain:
+		Same five as before
+The pinout for the PIC16F690 should be something like:
+PORT	PIN	I/O	NAME	FUNCTION
+RA3	4	I	DISIPO	Serial data input
+RA5	2	O	DOSIPO	Serial data output
+RA4	3	O	CKSIPO	Clock output
+RC5	5	O	LDSIPO	Load date output
+RC4	6	O	CRSIPO	Clear register output
+RA0	19	I	DIPISO	Serial data input
+RA1	18	O	DOPISO	Serial data output
+RA2	17	O	CKPISO	Clock output
+RC0	16	O	LDSIPO	Load data output
+RC1	15	O	CRSIPO	Clear register output
+Mon Feb  4 00:42:08 CST 2013
+Each time Interface sends a prompt signal to Control, Control compares it to a list of
+prompt signals. Each prompt signal corresponds to a set of instructions, which are avai-
+lable to Control, from the moment Control receives the prompt signal. Example:
+	Prompt 0x00 (Command prompt):
+		0x00	Func A
+			Prompt 0x01 (Value prompt):
+				0x00 - 0xFF	Choose a number from 00 to FF
+		0x01	Func B
+			Prompt 0x02 (Value prompt):
+				0x05 - 0xA0	Choose a number from 05 to A0
+		0x02	Func C
+			Prompt 0x01 (Value prompt):
+				0x00 - 0xFF	Choose a number from 00 to FF
+			Prompt 0x03 (Command prompt):
+				0x00	Func D
+				0x01	Func E
+So, one could define a spectrum. Say: Prompts 00 to 05 are Command signals, whereas prompts
+06 to 0A are Value signals.
+Tue Feb  5 01:13:59 CST 2013
+Ok, cool... The Makefile is done. Still gotta edit main.asm to test some subroutines.
+The thing is practically writing itself now. Remember to include coff.inc to be able to
+use embedded commands in the first TX RX test.
+Tue Feb  5 18:29:12 CST 2013
+PIC16F690's RB7 (TX) terminal, is cleared by the initial set_pinout_tris subroutine.
+Then, when RCSTA,7 is set, RB7 is set, because all eusart transmissions begin with a 1,
+and are initialized by a "Start bit" of value 0 (LOW). In order for the Start bit to be
+noticed, TX (RB7) must be, originally, set (in 1, HIGH). If, by some random chance, RB7 is
+initially set, then it is cleared by set_pinout_tris, and then, set once again by
+set_eusart_19200, then the RX terminal of whatever is on the other side (e.g. Control)
+will interpret that as an FF byte (11111111). The "Stop bit" is always high, so there is
+no way of distinguishing this RB7 toggle from a legit transmission of the FF byte.
+			...or at least that's what gpsim would have us believe
+			from running set_ports with it...
+^^^^^^^^^^^ I just mention this so that it will be kept in mind when designing the
+		greet.asm subroutine.
+BTW: gpsim has a glitch! The first time some usart test is run, it fails. One must "Stop"
+"Reset" and "Run" in order for it to work. If "Stop,Reset,Run" is issued again, it fails
+again, but if it is then re-issued, it works, etc. gpsim usart toggles on and off for
+some reason, after every "Reset". Funny.
+Thu Feb  7 09:32:11 CST 2013
+An interesting register is TRMT (TXSTA,1), which is set, unless the TSR (transmission shift
+register) is shifting some byte out. The thing is: there is no doc as to WHEN TRMT clears.
+The graph in the PIC16F690 datasheet shows TSR clearing a little while after the interrupt
+register TXIF (PIR1,4) pulses. The datasheet also mentions that TXIF pulses 1 TCY after
+the byte has been copied from TXREG into the TSR. Now: Does this mean that TRMT becomes
+low only after TXIF has pulsed? Does this mean that TSR becmoes low, only after 2 TCYs?
+I ask myself this because, the graph shows TRMT toggling only after TXIF, but there is
+no explicir mention of WHEN TRMT clears. One more thing though: it is necessary to banksel
+from TXREG's bank to TRMT's bank, so whatever amount of time cycles that takes, gets
+consumed before we can probe from TRMT. Maybe, TRMT takes more than the TCYs it takes for
+banksel to switch banks, maybe not.
+Here's an idea to test that:
+	1.	Write a byte to TXREG
+	2.	Immediately switch to TRMT's bank
+	3.	Store TRMT's state in a unique register
+	4.	Repeat 3 a couple of times (5 maybe)
+	5.	Output the result, byte by byte on PORTC,0 - 5, or something.
+If the result is something like 001111 then that would tell us approximately how many
+TCYs we have to waste (with something like nop) in order for TRMT to hold a valid result.
+References:
+In the PIC16F690 datasheet (microchip document):
+	12.1.1. EUSART Asynchronous Transmitter
+		Figre 12-3: Asynchronous Transmission
+Today, I could also test clock tuning in the PIC16F690. I'll go get the source from that
+post I made at pic-linux.foroactivo.com (or something) from the cybercafe.

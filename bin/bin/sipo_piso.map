@@ -1,0 +1,36 @@
+gplink-0.13.7 beta
+Map File - Created 2-8-2013  01:09:35
+ 
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                    start       code   00000000    program   0x000002
+                    libsp       code   0x000001    program   0x000094
+                     prog       code   0x00004b    program   0x00000c
+                  .config       code   0x002007    program   0x000002
+ 
+                              Program Memory Usage
+                               Start         End
+                           ---------   ---------
+                            0x002007    0x002007
+                            00000000    00000000
+                            0x00004b    0x000050
+                            0x000001    0x00004a
+ 
+                            82 program addresses used
+ 
+                              Symbols
+                     Name    Address   Location    Storage File
+                ---------  ---------  ---------  --------- ---------
+                     main   0x00004b    program     static src/bin/main_sipo_piso.asm
+                  .direct   0x00004c    program     static src/bin/main_sipo_piso.asm
+                       aa   0x000050    program     static src/bin/main_sipo_piso.asm
+                set_ports   0x000001    program     extern ./src/lib/set_ports.asm
+          set_pinout_tris   0x000005    program     extern ./src/lib/set_pinout_tris.asm
+                  mv_rx_w   0x000013    program     extern ./src/lib/mv_rx_w.asm
+            _libsp_000003   0x000016    program     static ./src/lib/mv_rx_w.asm
+                  mv_w_tx   0x00001b    program     extern ./src/lib/mv_w_tx.asm
+            _libsp_000008   0x000023    program     static ./src/lib/mv_w_tx.asm
+         set_anselh_ansel   0x000025    program     extern ./src/lib/set_anselh_ansel.asm
+         set_eusart_19200   0x00002c    program     extern ./src/lib/set_eusart_19200.asm
+ 

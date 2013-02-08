@@ -1,0 +1,4 @@
+#!/bin/bash
+while read -r LINE ; do
+	printf "${LINE}\n" | ed ${1}
+done

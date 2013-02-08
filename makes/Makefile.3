@@ -1,0 +1,35 @@
+libdir = ./bin/lib
+bindir = ./bin/bin
+incdir = ./bin/include
+
+src_libdir = ./src/lib
+src_bindir = ./src/bin
+src_incdir = ./src/include
+
+objects := ${libdir}/main.o ${libdir}/set_ports.o ${libdir}/mv_w_tx.o ${libdir}/mv_rx_w.o \
+${libdir}/mv_w_sipo.o ${libdir}/mv_piso_w.o \
+${libdir}/set_anselh_ansel.o ${libdir}/set_pinout_tris.o \
+${libdir}/set_eusart_19200.o
+
+includes := ${incdir}/config.inc ${incdir}/signals.inc
+
+output = ${bindir}/main.hex
+script = /usr/share/gputils/lkr/16f690.lkr
+
+vpath %.inc ${src_incdir}
+vpath %.asm ${src_libdir} ${src_bindir}
+
+${output} : ${objects}
+	gplink -m -o ${@} -s ${script} ${^}
+
+${objects} : ${libdir}/%.o : %.asm ${includes}
+	gpasm -c -o ${@} -I${src_incdir} ${<}
+
+${includes} : ${incdir}/%.inc : %.inc
+	cp ${<} ${@}
+
+sim :
+	test -e ${bindir}/main.cod && gpsim -L. -pp16f690 -s ${bindir}/main.cod
+
+clean :
+	rm ${libdir}/* ${incdir}/* ${bindir}/*

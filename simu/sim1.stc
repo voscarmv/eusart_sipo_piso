@@ -1,0 +1,14 @@
+frequency 4000000
+module library /usr/local/lib/libgpsim_modules.so
+module load usart U1
+U1.console = true
+U1.txbaud = 19200
+U1.rxbaud = 19200
+U1.xpos = 72
+U1.ypos = 340
+
+node ctx_irx itx_crx
+attach ctx_irx U1.TXPIN portb5
+attach itx_crx portb7 U1.RXPIN
+
+scope.ch0 = "portb7"

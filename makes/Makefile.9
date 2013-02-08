@@ -1,0 +1,86 @@
+#
+#	Variables:
+#
+
+libdir = ./bin/lib
+bindir = ./bin/bin
+incdir = ./bin/include
+
+src_libdir = ./src/lib
+src_bindir = ./src/bin
+src_incdir = ./src/include
+
+objects := ${libdir}/set_ports.o ${libdir}/mv_w_tx.o ${libdir}/mv_rx_w.o \
+${libdir}/mv_w_sipo.o ${libdir}/mv_piso_w.o \
+${libdir}/set_anselh_ansel.o ${libdir}/set_pinout_tris.o \
+${libdir}/set_eusart_19200.o
+
+objname := sipo_piso
+mainobj := ${bindir}/main_${objname}.o
+mosrc := ${src_bindir}/main_${objname}.asm
+moincludes := ${incdir}/config.inc ${incdir}/signals.inc
+modeps := ${mosrc} ${moincludes}
+mainlibs := ${libdir}/libsp.a
+maindeps := ${mainobj} ${mainlibs}
+script = /usr/share/gputils/lkr/16f690.lkr
+
+output = ${bindir}/${objname}.hex
+
+#
+#	Paths:
+#
+
+vpath %.inc ${src_incdir}
+vpath %.asm ${src_libdir}
+
+#
+#	Main target:
+#
+
+all : ${output}
+
+${output} : ${maindeps} ${script}
+	gplink -m -o ${@} -s ${script} ${maindeps}
+
+#
+#	Main object:
+#
+
+${mainobj} : ${modeps}
+	gpasm -c -o ${@} -I${incdir} ${<}
+
+${moincludes} : ${incdir}/%.inc : %.inc
+	cp ${<} ${@}
+
+#
+#	Libraries:
+#
+
+${mainlibs} : ${objects}
+	test -e ${@} || gplib -c ${@} ${^} && gplib -r ${@} ${?}
+
+${objects} : ${libdir}/%.o : %.asm
+	gpasm -c -o ${@} -I${incdir} ${<}
+
+#
+#	Phonies:
+#
+
+sim :
+	test -e ${bindir}/sipo_piso.cod && \
+	 gpsim -L. -pp16f690 -s ${bindir}/sipo_piso.cod -c simu/sim1.stc
+
+clean :
+	rm ${libdir}/* ${incdir}/* ${bindir}/*
+../picera.sh
+#!/bin/bash
+pk2cmd -E -B/usr/share/pk2 -PPIC16F690 
+../picprog.sh
+#!/bin/bash
+pk2cmd -M -B/usr/share/pk2 -PPIC16F690 -F${1}
+../picrun.sh
+#!/bin/bash
+pk2cmd -PPIC16F690 -B/usr/share/pk2 -A5 -T
+../picstop.sh
+#!/bin/bash
+pk2cmd -PPIC16F690 -B/usr/share/pk2 -R

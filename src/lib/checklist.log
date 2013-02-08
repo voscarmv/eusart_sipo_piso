@@ -1,0 +1,13 @@
+libsp.a
+Serial-parallel communications library for the PIC16F690
+
+Done:
+	set_ports.asm
+		set_anselh_ansel.asm
+		set_pinout_tris.asm
+		set_eusart_19200.asm
+
+		mv_w_tx.asm
+		mv_rx_w.asm
+		mv_w_sipo.asm
+		mv_piso_w.asm

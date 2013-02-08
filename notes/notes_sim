@@ -1,0 +1,100 @@
+Fri Jan 11 21:26:25 CST 2013
+Four main elements must exist for this simulation to represent the ttyUSB
+interface. For all practical purposes, I will be using the PL2303HX USB to
+TTL UART interface from Prolific, or the CP2120 interface from Silicon Labs.
+	1. A process (script) representing the control application.
+	2. A process representing the hardware on the other side of the
+		ttyUSB interface.
+	3. A signal generator, to take 1 byte samples from.
+	4. A display, or log, to register interface output.
+1. and 2. will have a set of I/O instructions. Each, represented by
+a single byte. This is the suggested set:
+	00	Are you ready?
+		Ask the other side if they are ready for receiveing
+		the next byte.
+	01	I am ready
+		Confirm that this side is ready for receiving the
+		next byte
+	02	Give me input
+		Ask the other side to start sending input
+	03	How many input bytes?
+		Ask the other side how much input to send
+		This is a response to the 02 request
+		This number cannot be greater than 255 because
+		because the response is 1 byte long
+		If more than 255 bytes are required, at the end of the
+		first amount of sent bytes, the sender asks 03 again
+		This continues, until the response is 00
+Follow an ed-like design, where a toggle allows input, and another toggle cancels it.
+	04	Prepare for my output
+		Ask the other side to start receiving input
+	05	How many output bytes?
+Sun Jan 13 11:42:52 CST 2013
+Should both sides have the same set of instructions? Maybe not. Let's name them.
+	Control
+		This is the control application.
+	Interface
+		This is the hardware interface.
+There were several problems involving data loss and synchronization in previous
+experiments.
+	1.	When sending bytes thus:
+			printf '\x00\x01\x02' > /dev/ttyUSB0
+		sometimes, the hardware connected to the PL2303HX (in this case, a
+		PIC16F690 programmed as a UART SIPO/PISO interface), would
+		take too long to interpret one of the bytes.
+		This causes some intructions to be ignored.
+		A solution would be to sync through a pingpong algorithm.
+		There is no input buffer on Interface, but there is on Control.
+		Therefor: there is no limit to how fast Interface can send data to Control.
+		But, there is a limit to how fast Control can send data to Interface.
+		The maximum frequency with which bytes get sent to Interface may
+		over-saturate it's ability to interpret them.
+	1.1.	To correct this, a typical com session, should look something like this:
+			a) Control gives Interface a 1 byte instruction
+			b) Control waits for an answer
+				The answer may be several bytes long
+				There is no limit to the frequency with which bytes
+				are transfered from Interface to Control
+			c) Interface responds when it's ready to receive more input
+	1.2.	An alternative, would be to design a hardware buffer. But, so far, there
+		are no plans for doing this.
+	2.	There is no greeting algorithm
+		Control should probe for Interface at the beginning of any communications
+		session.
+Suggested algorithm for reading bytes from PISO:
+	1. Control says: Give me PISO, and waits.
+	2. Interface responds: Got it. How many bytes?
+	3. Control says: N bytes.
+	4. If N>0, continue. Else, Interface goes back to interpreting instructions.
+	5. Interface loads PISO registers, sends N bytes, and asks again: How many bytes?
+	6. If N>0, go back to 5. Else, Interface goes back to interpreting instructions.
+Suggested algorithm for writing bytes to SIPO:
+	1. Control says: prepare for SIPO.
+	2. Interfece asks: How many bytes?
+	3. Control responds: N bytes.
+	4. If N>0, Interface prepares for N bytes, and tells Control it's ready for
+		the next byte. Else, Interface loads SIPO registers,
+		and goes back to interpreting 1 byte long
+		instructions.
+	5. Control sends one byte, and waits for a response.
+	6. Interface pushes the byte into the SIPO and then says: Ok, give me another.
+	7. This continues until N bytes are sent from Control to Interface.
+	8. After N bytes have been sent, Interface asks: How many bytes? again
+	9. If N>0, go back to 5. Else, Interface loads SIPO goes back to interpreting 
+		instructions.
+Suggested algorithm for greeting:
+	1. Control checks to see if TTY exists (e.g. TTY='/dev/ttyUSB0')
+	2. If TTY exists, and is character special (see if test -c works for this)
+		then, continue. Else, exit with error.
+	3. Control asks Interface: Are you there?
+	4. If Interface responds, proceed. If 3 has happened too many times, exit with
+		error. Go back to 3.
+Mon Jan 21 10:29:57 CST 2013
+Development of the simulator has stopped for now, in favor of development of the PIC
+assembly code for p16f690.
+(directory gputils/exp/relocatable)
+Tue Jan 22 10:35:06 CST 2013
+These notes are from a different project: a couple of scripts to simulate the
+interaction between the PC and some UART interface connected to a uC/PIC.
+They are useful, though, for producing the protocol which will govern the actual .asm
+libraries for the real PIC.
