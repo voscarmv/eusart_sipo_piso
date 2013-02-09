@@ -184,7 +184,12 @@ There are two ways to write a bash timeout. One by Seebach, the other by Blinn.
 Thu Jan 31 09:07:37 CST 2013
 The Seebach way is actually taken from one Alan Barrett. Look into that.
 This is the Barrett way:
-	
+	Beginning portable shell programming, from novice to professional
+		Invocation and execution
+		execution
+		More on jobs and tasks
+		Making effective use of wait
+		page 135
 The Blinn way, goes like this:
 	Portable shell programming, an extensive collection of bourne shell scripts
 		Interacting with users
@@ -432,3 +437,7 @@ In the PIC16F690 datasheet (microchip document):
 		Figre 12-3: Asynchronous Transmission
 Today, I could also test clock tuning in the PIC16F690. I'll go get the source from that
 post I made at pic-linux.foroactivo.com (or something) from the cybercafe.
+Fri Feb  8 15:48:36 CST 2013
+Correction of definitions: the "loopback test" is not such. It is just a "ping test". A
+short greeting message, the purpose of which is only to be responded by a greetback.
+Change "loopback check algorithm" for "ping test"
