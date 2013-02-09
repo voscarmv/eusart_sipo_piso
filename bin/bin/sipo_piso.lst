@@ -1,6 +1,6 @@
 gplink-0.13.7 beta
 Copyright (c) 1998-2005 gputils project
-Listing File Generated: 2-9-2013  12:31:23
+Listing File Generated: 2-9-2013  14:23:06
  
  
 Address  Value    Disassembly              Source
@@ -59,18 +59,18 @@ Address  Value    Disassembly              Source
                                            	extern		mv_w_tx
                                            
                                            start	code		H'0000'
-000000   284b     goto	0x4b                	goto		main
+000000   2849     goto	0x49                	goto		main
                                            
                                            prog	code
                                            main:
-00004b   2001     call	0x1                 	call		set_ports
+000049   2001     call	0x1                 	call		set_ports
                                            	.direct		"c","U1.tx=55"
-00004c   2013     call	0x13                	call		mv_rx_w
+00004a   2013     call	0x13                	call		mv_rx_w
+00004b   201b     call	0x1b                	call		mv_w_tx
+00004c   3081     movlw	0x81               	movlw		B'10000001'
 00004d   201b     call	0x1b                	call		mv_w_tx
-00004e   3081     movlw	0x81               	movlw		B'10000001'
-00004f   201b     call	0x1b                	call		mv_w_tx
                                            aa:
-000050   2850     goto	0x50                	goto		aa
+00004e   284e     goto	0x4e                	goto		aa
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -86,9 +86,9 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            set_ports:
-000001   2025     call	0x25                	call		set_anselh_ansel	;;	<< Initial pinout / EUSART settings
+000001   2023     call	0x23                	call		set_anselh_ansel	;;	<< Initial pinout / EUSART settings
 000002   2005     call	0x5                 	call		set_pinout_tris		;;	<<
-000003   202c     call	0x2c                	call		set_eusart_19200	;;	<<
+000003   202a     call	0x2a                	call		set_eusart_19200	;;	<<
 000004   0008     return                   	return
                                            	end
                                            	processor	pic16f690
@@ -156,14 +156,11 @@ Address  Value    Disassembly              Source
 00001c   1303     bcf	0x3, 0x6             
 00001d   0099     movwf	0x19               	movwf		TXREG		;;	<<
                                            
-00001e   0000     nop                      	nop				;;	<< Wait for TRMT to be cleared
-00001f   0000     nop                      	nop				;;	<<
-                                           
-000020   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< Pause execution until TRMT (TXSTA,1)
-000021   1303     bcf	0x3, 0x6             
-000022   1c98     btfss	0x18, 0x1          	btfss		TXSTA,1		;;	<< is set again. i.e. until the byte
-000023   2822     goto	0x22                	goto		$-1		;;	<< transmission completes
-000024   0008     return                   	return
+00001e   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< Pause execution until TRMT (TXSTA,1)
+00001f   1303     bcf	0x3, 0x6             
+000020   1c98     btfss	0x18, 0x1          	btfss		TXSTA,1		;;	<< is set again. i.e. until the byte
+000021   2820     goto	0x20                	goto		$-1		;;	<< transmission completes
+000022   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -175,13 +172,13 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            set_anselh_ansel:
-000025   1283     bcf	0x3, 0x5             	banksel		ANSEL		;;	<< ANSELH:ANSEL Settings
-000026   1703     bsf	0x3, 0x6             
-000027   019e     clrf	0x1e                	clrf		ANSEL		;;	<<
-000028   1283     bcf	0x3, 0x5             	banksel		ANSELH		;;	<<
-000029   1703     bsf	0x3, 0x6             
-00002a   019f     clrf	0x1f                	clrf		ANSELH		;;	<<
-00002b   0008     return                   	return
+000023   1283     bcf	0x3, 0x5             	banksel		ANSEL		;;	<< ANSELH:ANSEL Settings
+000024   1703     bsf	0x3, 0x6             
+000025   019e     clrf	0x1e                	clrf		ANSEL		;;	<<
+000026   1283     bcf	0x3, 0x5             	banksel		ANSELH		;;	<<
+000027   1703     bsf	0x3, 0x6             
+000028   019f     clrf	0x1f                	clrf		ANSELH		;;	<<
+000029   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -193,36 +190,36 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            set_eusart_19200:
-00002c   1283     bcf	0x3, 0x5             	banksel		INTCON		;;	<< These settings configure interrupt
-00002d   1303     bcf	0x3, 0x6             
-00002e   138b     bcf	0xb, 0x7             	bcf		INTCON,7	;;	<< functions for the PIC16F690 EUSART.
-00002f   130b     bcf	0xb, 0x6             	bcf		INTCON,6	;;	<<
-000030   1683     bsf	0x3, 0x5             	banksel		PIE1		;;	<<
-000031   1303     bcf	0x3, 0x6             
-000032   128c     bcf	0xc, 0x5             	bcf		PIE1,5		;;	<<
+00002a   1283     bcf	0x3, 0x5             	banksel		INTCON		;;	<< These settings configure interrupt
+00002b   1303     bcf	0x3, 0x6             
+00002c   138b     bcf	0xb, 0x7             	bcf		INTCON,7	;;	<< functions for the PIC16F690 EUSART.
+00002d   130b     bcf	0xb, 0x6             	bcf		INTCON,6	;;	<<
+00002e   1683     bsf	0x3, 0x5             	banksel		PIE1		;;	<<
+00002f   1303     bcf	0x3, 0x6             
+000030   128c     bcf	0xc, 0x5             	bcf		PIE1,5		;;	<<
                                            
-000033   1683     bsf	0x3, 0x5             	banksel		SPBRGH		;;	<< These settings assign the following
-000034   1303     bcf	0x3, 0x6             
-000035   019a     clrf	0x1a                	clrf		SPBRGH		;;	<< values to the PIC16F690 EUSART:
-000036   1683     bsf	0x3, 0x5             	banksel		SPBRG		;;	<<
-000037   1303     bcf	0x3, 0x6             
-000038   300c     movlw	0xc                	movlw		D'12'		;;	<< FOSC		= 4 MHz
-000039   0099     movwf	0x19               	movwf		SPBRG		;;	<< SYNC		= 0
-00003a   1683     bsf	0x3, 0x5             	banksel		BAUDCTL		;;	<< BRGH		= 1
-00003b   1303     bcf	0x3, 0x6             
-00003c   119b     bcf	0x1b, 0x3            	bcf		BAUDCTL,3	;;	<< BRG16	= 0
-00003d   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< SPBRGH:SPBRG	= 12
-00003e   1303     bcf	0x3, 0x6             
-00003f   1518     bsf	0x18, 0x2            	bsf		TXSTA,2		;;	<< BR           = 19200
-000040   1218     bcf	0x18, 0x4            	bcf		TXSTA,4		;;	<< ACTBR        = 19.23 k
-000041   1198     bcf	0x18, 0x3            	bcf		TXSTA,3		;;	<< ERROR        = 0.16 %
-000042   1698     bsf	0x18, 0x5            	bsf		TXSTA,5		;;	<<
-000043   1318     bcf	0x18, 0x6            	bcf		TXSTA,6		;;	<<
-000044   1283     bcf	0x3, 0x5             	banksel		RCSTA		;;	<<
-000045   1303     bcf	0x3, 0x6             
-000046   1198     bcf	0x18, 0x3            	bcf		RCSTA,3		;;	<<
-000047   1618     bsf	0x18, 0x4            	bsf		RCSTA,4		;;	<<
-000048   1318     bcf	0x18, 0x6            	bcf		RCSTA,6		;;	<<
-000049   1798     bsf	0x18, 0x7            	bsf		RCSTA,7		;;	<<
-00004a   0008     return                   	return
+000031   1683     bsf	0x3, 0x5             	banksel		SPBRGH		;;	<< These settings assign the following
+000032   1303     bcf	0x3, 0x6             
+000033   019a     clrf	0x1a                	clrf		SPBRGH		;;	<< values to the PIC16F690 EUSART:
+000034   1683     bsf	0x3, 0x5             	banksel		SPBRG		;;	<<
+000035   1303     bcf	0x3, 0x6             
+000036   300c     movlw	0xc                	movlw		D'12'		;;	<< FOSC		= 4 MHz
+000037   0099     movwf	0x19               	movwf		SPBRG		;;	<< SYNC		= 0
+000038   1683     bsf	0x3, 0x5             	banksel		BAUDCTL		;;	<< BRGH		= 1
+000039   1303     bcf	0x3, 0x6             
+00003a   119b     bcf	0x1b, 0x3            	bcf		BAUDCTL,3	;;	<< BRG16	= 0
+00003b   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< SPBRGH:SPBRG	= 12
+00003c   1303     bcf	0x3, 0x6             
+00003d   1518     bsf	0x18, 0x2            	bsf		TXSTA,2		;;	<< BR           = 19200
+00003e   1218     bcf	0x18, 0x4            	bcf		TXSTA,4		;;	<< ACTBR        = 19.23 k
+00003f   1198     bcf	0x18, 0x3            	bcf		TXSTA,3		;;	<< ERROR        = 0.16 %
+000040   1698     bsf	0x18, 0x5            	bsf		TXSTA,5		;;	<<
+000041   1318     bcf	0x18, 0x6            	bcf		TXSTA,6		;;	<<
+000042   1283     bcf	0x3, 0x5             	banksel		RCSTA		;;	<<
+000043   1303     bcf	0x3, 0x6             
+000044   1198     bcf	0x18, 0x3            	bcf		RCSTA,3		;;	<<
+000045   1618     bsf	0x18, 0x4            	bsf		RCSTA,4		;;	<<
+000046   1318     bcf	0x18, 0x6            	bcf		RCSTA,6		;;	<<
+000047   1798     bsf	0x18, 0x7            	bsf		RCSTA,7		;;	<<
+000048   0008     return                   	return
                                            	end

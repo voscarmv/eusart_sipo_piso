@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE  1
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -58,7 +58,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
   00000002     00020 h += 1
   FFFFFFFD     00019 S#v(h)  equ     ~h
   00000003     00020 h += 1
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE  2
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -88,7 +88,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0004 2000      00021         call            mv_w_tx
 0005 00022 aa:
 0005 2800      00023         goto            aa
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE  3
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE  3
 
 
 SYMBOL TABLE
@@ -147,7 +147,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE  4
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -207,7 +207,7 @@ EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
 EECON2                            0000018D
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE  5
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -267,7 +267,7 @@ NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
 NOT_PD                            00000003
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE  6
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -327,7 +327,7 @@ RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
 RCIF                              00000005
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE  7
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -387,7 +387,7 @@ T0IE                              00000005
 T0IF                              00000002
 T0SE                              00000004
 T1CKPS0                           00000004
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE  8
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -447,7 +447,7 @@ TUN0                              00000000
 TUN1                              00000001
 TUN2                              00000002
 TUN3                              00000003
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE  9
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -507,7 +507,7 @@ _EC_OSC                           00003FFB
 _EXTRC                            00003FFF
 _EXTRCIO                          00003FFE
 _EXTRC_OSC_CLKOUT                 00003FFF
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE 10
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -567,7 +567,7 @@ C_SECTION                         109
 C_STAT                            3
 C_STRTAG                          10
 C_TPDEF                           13
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  12:31:17           PAGE 11
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-9-2013  14:23:03           PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
