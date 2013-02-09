@@ -1,3 +1,10 @@
+#	Change variables:
+#		objects
+#		objname
+#		libname
+#		includes
+#	for a different project of the same form.
+
 #
 #	Variables:
 #
@@ -23,7 +30,9 @@ libname = libsp
 
 mainobj := ${bindir}/main_${objname}.o
 mosrc := ${src_bindir}/main_${objname}.asm
-moincludes := ${incdir}/config.inc ${incdir}/signals.inc
+moincludes := \
+	${incdir}/config.inc \
+	${incdir}/signals.inc
 modeps := ${mosrc} ${moincludes}
 
 mainlibs := ${libdir}/${libname}.a
