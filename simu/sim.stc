@@ -1,0 +1,87 @@
+# This is a list of how the ICs 74595 and 74596 are connected to the PIC to provide SIPO and
+# PISO data propagation.
+# All information is taken from the 74LS595 and 74LS597 Texas Instruments datasheets.
+# 
+# ------------------------------------------------------------------------------------
+# IC 74595 SIPO				| PIC16F690
+# PORT	PIN	I/O	FUNC		| PORT	PIN	I/O	NAME	FUNC
+# ~SRCLR	10	I	CLR low pulse	| RC4	6	O	CRSIPO	Clear out
+# RCK	12	I	LD high pulse	| RC5	5	O	LDSIPO	Load D out
+# SER	14	I	Serial in	| RA5	2	O	DOSIPO	Ser data out
+# SRCK	11	I	Serial in CK	| RA4	3	O	CKSIPO	Clock out
+# QH'	9	O	Serial out	| RA3	4	I	DISIPO	Ser data in
+# 					|-------------------------------------------
+# 					| Set to VCC or GND
+# VCC	16	I	Voltage input	| VCC
+# GND	8	I	Ground		| GND
+# ~G	13	I	Out chns gauge	| GND
+# QA	15	O	A out channel	| NC
+# QB	1	O	B out channel	| NC
+# QC	2	O	C out channel	| NC
+# QD	3	O	D out channel	| NC
+# QE	4	O	E out channel	| NC
+# QF	5	O	F out channel	| NC
+# QG	6	O	G out channel	| NC
+# QH	7	O	H out channel	| NC
+# ------------------------------------------------------------------------------------
+# 
+# NOTE: QH' may be connected either to RA3, or to the next 74595's SER to expand SIPO.
+# 
+# ------------------------------------------------------------------------------------
+# IC 74597 PISO				| PIC16F690
+# PORT	PIN	I/O	FUNC		| PORT	PIN	I/O	NAME	FUNC
+# ~SRCLR	10	I	CLR low pulse	| RC1	15	O	CRPISO	Clear out
+# RCK	12	I	LD1 high pulse	| RC0	16	O	LD1PISO	Load D1 out
+# ~SRLOAD	13	I	LD2 high pulse	| RC2	14	O	LD2PISO	Load D2 out
+# SER	14	I	Serial in	| RA1	18	O	DOPISO	Ser data out
+# SRCK	11	I	Serial in CK	| RA2	17	O	CKPISO	Clock out
+# QH'	9	O	Serial out	| RA0	19	I	DIPISO	Ser data in
+# 					|-------------------------------------------
+# 					| Set to VCC or GND
+# VCC	16	I	Voltage input	| VCC
+# GND	8	I	Ground		| GND
+# A	15	I	A in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+# B	1	I	B in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+# C	2	I	C in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+# D	3	I	D in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+# E	4	I	E in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+# F	5	I	F in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+# G	6	I	G in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+# H	7	I	H in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+# ------------------------------------------------------------------------------------
+# 
+# NOTE: QH' may be connected either to RA0, or to the next 74597's SER to expand PISO. Also
+# remember to first pulse LD1PISO and then LD2PISO to load byte data into PISO registers.
+#
+# Now, some equivalencies between the actual Texas Instruments ICs, and the gpsim modules:
+#
+#	THE EQUIVS GO RIGHT HERE
+frequency 4000000
+
+stimulus asy
+	initial_state 1
+	start_cycle 0
+	{ 0,1 }
+	name one
+end
+
+stimulus asy
+	initial_state 0
+	start_cycle 0
+	{ 0,0 }
+	name zero
+end
+
+module library /usr/local/lib/libgpsim_modules.so
+module load usart U1
+U1.console = true
+U1.txbaud = 19200
+U1.rxbaud = 19200
+U1.xpos = 72
+U1.ypos = 340
+
+node ctx_irx itx_crx
+attach ctx_irx U1.TXPIN portb5
+attach itx_crx portb7 U1.RXPIN
+
+scope.ch0 = "portb7"

@@ -7,10 +7,10 @@ X	set_ports.asm
 X		set_anselh_ansel.asm
 X		set_pinout_tris.asm
 X		set_eusart_19200.asm
-	sipo.asm
+X	sipo.asm
 X		mv_w_sipo.asm
 X		load_sipo.asm
-	piso.asm
+X	piso.asm
 X		mv_piso_w.asm
 X		load_piso.asm
 	loopback_sipo.asm

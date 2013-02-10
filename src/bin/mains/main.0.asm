@@ -11,11 +11,16 @@
 	extern		piso
 
 start	code		H'0000'
-	call		set_ports
 	goto		main
 
 prog	code
 main:
-	call		sipo
-	call		piso
+	call		set_ports
+	.direct		"c","U1.tx=55"
+	call		mv_rx_w
+	call		mv_w_tx
+	movlw		B'10000001'
+	call		mv_w_tx
+aa:
+	goto		aa
 	end

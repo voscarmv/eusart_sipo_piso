@@ -497,3 +497,6 @@ H	7	I	H in channel	| GND through 5K Ohm < R < 8K Ohm resistor
 
 NOTE: QH' may be connected either to RA0, or to the next 74597's SER to expand PISO. Also,
 remember to first pulse LD1PISO and then LD2PISO to load byte data into PISO registers.
+Sun Feb 10 11:20:57 CST 2013
+TODO for now: finish writing sim.stc file for simulation of sipo.o and piso.o. Then, write
+loopback functions, and test (probably with the same sim.stc).

@@ -51,7 +51,7 @@ script = /usr/share/gputils/lkr/16f690.lkr
 
 output := ${bindir}/${objname}.hex
 
-stc = ./simu/sim.stc
+stc = ./simu/sim1.stc
 
 #
 #	Paths:

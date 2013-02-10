@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/mv_w_tx.asm2-9-2013  23:33:17           PAGE  1
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-9-2013  23:33:10           PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -10,18 +10,35 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                00002 ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
                00607         LIST
                00003 
-               00004         global          mv_w_tx
-               00005 
-               00006 libsp   code
-0000 00007 mv_w_tx:
-0000 1283 1303 00008         banksel         TXREG           ;;      << Move the contents of WREG to TXREG
-0002 0099      00009         movwf           TXREG           ;;      <<
-               00010 
-0003 1683 1303 00011         banksel         TXSTA           ;;      << Pause execution until TRMT (TXSTA,1)
-0005 1C98      00012         btfss           TXSTA,1         ;;      << is set again. i.e. until the byte
-0006 2800      00013         goto            $-1             ;;      << transmission completes
-0007 0008      00014         return
-gpasm-0.13.7 beta               ./src/lib/mv_w_tx.asm2-9-2013  23:33:17           PAGE  2
+               00004         extern          mv_w_tx
+               00005         extern          mv_rx_w
+               00006         extern          mv_piso_w
+               00007         extern          load_piso
+               00008         extern          clear_piso
+               00009 
+               00010         global          piso
+               00011 
+               00012         udata
+               00013 NBYTES  res             1
+               00014 
+               00015 libsp   code
+0000 00016 piso:
+0000 3002      00017         movlw           .2
+0001 2000      00018         call            mv_w_tx
+0002 2000      00019         call            mv_rx_w
+0003 0080      00020         movwf           NBYTES
+0004 3A00      00021         xorlw           .0
+0005 1903      00022         skpnz
+0006 2800      00023         goto            finish
+0007 2000      00024         call            load_piso
+0008 00025 ser_in:
+0008 2000      00026         call            mv_piso_w
+0009 2000      00027         call            mv_w_tx
+000A 0B80      00028         decfsz          NBYTES,1
+000B 2800      00029         goto            ser_in
+000C 00030 finish:
+000C 0008      00031         return
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-9-2013  23:33:10           PAGE  2
 
 
 SYMBOL TABLE
@@ -80,7 +97,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/mv_w_tx.asm2-9-2013  23:33:17           PAGE  3
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-9-2013  23:33:10           PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -140,7 +157,7 @@ EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
 EECON2                            0000018D
-gpasm-0.13.7 beta               ./src/lib/mv_w_tx.asm2-9-2013  23:33:17           PAGE  4
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-9-2013  23:33:10           PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -195,17 +212,18 @@ LTS                               00000001
 MC1OUT                            00000007
 MC2OUT                            00000006
 MSK                               00000093
+NBYTES                            00000000
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
-NOT_PD                            00000003
-gpasm-0.13.7 beta               ./src/lib/mv_w_tx.asm2-9-2013  23:33:17           PAGE  5
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-9-2013  23:33:10           PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+NOT_PD                            00000003
 NOT_POR                           00000001
 NOT_RABPU                         00000007
 NOT_T1SYNC                        00000002
@@ -259,13 +277,13 @@ RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
-RCIF                              00000005
-gpasm-0.13.7 beta               ./src/lib/mv_w_tx.asm2-9-2013  23:33:17           PAGE  6
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-9-2013  23:33:10           PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+RCIF                              00000005
 RCREG                             0000001A
 RCSTA                             00000018
 RD                                00000000
@@ -319,13 +337,13 @@ T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
-T1IF                              00000000
-gpasm-0.13.7 beta               ./src/lib/mv_w_tx.asm2-9-2013  23:33:17           PAGE  7
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-9-2013  23:33:10           PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+T1IF                              00000000
 T1OSCEN                           00000003
 T2CKPS0                           00000000
 T2CKPS1                           00000001
@@ -379,13 +397,13 @@ TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
-TXIF                              00000004
-gpasm-0.13.7 beta               ./src/lib/mv_w_tx.asm2-9-2013  23:33:17           PAGE  8
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-9-2013  23:33:10           PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
 UA                                00000001
@@ -439,13 +457,13 @@ _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
-_IESO_ON                          00003FFF
-gpasm-0.13.7 beta               ./src/lib/mv_w_tx.asm2-9-2013  23:33:17           PAGE  9
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-9-2013  23:33:10           PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+_IESO_ON                          00003FFF
 _INTOSC                           00003FFD
 _INTOSCIO                         00003FFC
 _INTRC_OSC_CLKOUT                 00003FFD
@@ -459,8 +477,14 @@ _WDT_OFF                          00003FF7
 _WDT_ON                           00003FFF
 _XT_OSC                           00003FF9
 __16F690                          00000001
-_libsp_000006                     00000006
+clear_piso                        00000000
+finish                            0000000C
+load_piso                         00000000
+mv_piso_w                         00000000
+mv_rx_w                           00000000
 mv_w_tx                           00000000
+piso                              00000000
+ser_in                            00000008
 
 
 Errors   :       0

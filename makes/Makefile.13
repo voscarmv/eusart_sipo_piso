@@ -18,21 +18,12 @@ src_bindir = ./src/bin
 src_incdir = ./src/include
 
 objects := \
-	${libdir}/clear_sipo.o \
-	${libdir}/clear_piso.o \
+	${libdir}/mv_rx_w.o \
+	${libdir}/mv_w_tx.o \
 	${libdir}/set_ports.o \
 		${libdir}/set_anselh_ansel.o \
 		${libdir}/set_pinout_tris.o \
-		${libdir}/set_eusart_19200.o \
-	${libdir}/sipo.o \
-		${libdir}/mv_w_sipo.o \
-		${libdir}/load_sipo.o \
-	${libdir}/piso.o \
-		${libdir}/mv_piso_w.o \
-		${libdir}/load_piso.o \
-\
-		${libdir}/mv_rx_w.o \
-		${libdir}/mv_w_tx.o
+		${libdir}/set_eusart_19200.o
 
 objname = sipo_piso
 libname = libsp
@@ -51,7 +42,7 @@ script = /usr/share/gputils/lkr/16f690.lkr
 
 output := ${bindir}/${objname}.hex
 
-stc = ./simu/sim.stc
+stc = ./simu/sim1.stc
 
 #
 #	Paths:

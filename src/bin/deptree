@@ -3,6 +3,5 @@ Dependency tree for main:
 		mv_rx_w
 		mv_w_tx
 		set_ports
-			set_anselh_ansel
-			set_pinout_tris
-			set_eusart_19200
+		sipo
+		piso
