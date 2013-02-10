@@ -1,0 +1,9 @@
+	processor	pic16f690
+	include		<p16f690.inc>
+
+	global		func_name
+
+libname	code
+func_name:
+	return
+	end

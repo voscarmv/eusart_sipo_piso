@@ -18,7 +18,8 @@ set_pinout_tris:
 	clrf		PORTC		;;	   RA0	19	I	DIPISO	Ser data in
 					;;	   RA1	18	O	DOPISO	Ser data out
 					;;	   RA2	17	O	CKPISO	Clock out
-					;;	   RC0	16	O	LDPISO	Load D out
+					;;	   RC0	16	O	LD1PISO	Load D1 out
+					;;	   RC2	14	O	LD2PISO	Load D2 out
 					;;	   RC1	15	O	CRPISO	Clear out
 					;;	   RB5	12	I	RX	RX in
 					;;	   RB7	10	O	TX	TX out

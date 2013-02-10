@@ -1,4 +1,7 @@
 #!/bin/bash
+#	While editing with gnu ed, do
+#		.w !./e %
+#	to run ed commands on the current file
 while read -r LINE ; do
 	printf "${LINE}\n" | ed ${1}
 done
