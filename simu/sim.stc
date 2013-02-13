@@ -73,7 +73,9 @@ stimulus asy
 end
 
 module library /usr/local/lib/libgpsim_modules.so
+p16f690 = Interface
 module load usart U1
+U1 = Control
 U1.console = true
 U1.txbaud = 19200
 U1.rxbaud = 19200
@@ -84,4 +86,7 @@ node ctx_irx itx_crx
 attach ctx_irx U1.TXPIN portb5
 attach itx_crx portb7 U1.RXPIN
 
-scope.ch0 = "portb7"
+#	SIPO
+scope.ch0 = "porta5"
+scope.ch1 = "porta4"
+scope.ch2 = "portc5"

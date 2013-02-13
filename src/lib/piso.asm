@@ -10,14 +10,14 @@
 	global		piso
 
 	udata
-NBYTES	res		1
+COUNT	res		1
 
 libsp	code
 piso:
 	movlw		.2
 	call		mv_w_tx
 	call		mv_rx_w
-	movwf		NBYTES
+	movwf		COUNT
 	xorlw		.0
 	skpnz
 	goto		finish
@@ -25,7 +25,8 @@ piso:
 ser_in:
 	call		mv_piso_w
 	call		mv_w_tx
-	decfsz		NBYTES,1
+	banksel		COUNT
+	decfsz		COUNT,1
 	goto		ser_in
 finish:
 	return

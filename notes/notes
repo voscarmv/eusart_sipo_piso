@@ -500,3 +500,14 @@ remember to first pulse LD1PISO and then LD2PISO to load byte data into PISO reg
 Sun Feb 10 11:20:57 CST 2013
 TODO for now: finish writing sim.stc file for simulation of sipo.o and piso.o. Then, write
 loopback functions, and test (probably with the same sim.stc).
+Mon Feb 11 19:55:54 CST 2013
+Remember to use a pulldown resistor in each Input-Output node, e.g., in RCK-RC0.
+TODO:
+	1. Create .stc file for testing sipo.asm and piso.asm
+	2. In order to be able to test sipo/piso, shift registers are needed. gpsim has no
+		model for the 74597, but it does have a 74165 model. Use that, and look
+		for 74597 models for gpsim online. Look into the possibility of writing
+		own 74597 module.
+	3. Use embedded command to respond to prompt sent by sipo and puso subroutines.
+		Something like:
+			When U1.RX == "0x00", send corresponding response, etc.

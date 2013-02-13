@@ -1,6 +1,6 @@
 gplink-0.13.7 beta
 Copyright (c) 1998-2005 gputils project
-Listing File Generated: 2-9-2013  23:33:19
+Listing File Generated: 2-12-2013  12:30:00
  
  
 Address  Value    Disassembly              Source
@@ -62,12 +62,12 @@ Address  Value    Disassembly              Source
                                            
                                            start	code		H'0000'
 000000   2012     call	0x12                	call		set_ports
-000001   28e8     goto	0xe8                	goto		main
+000001   28ea     goto	0xea                	goto		main
                                            
                                            prog	code
                                            main:
-0000e8   2002     call	0x2                 	call		sipo
-0000e9   202c     call	0x2c                	call		piso
+0000ea   2002     call	0x2                 	call		sipo
+0000eb   202c     call	0x2c                	call		piso
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -84,26 +84,30 @@ Address  Value    Disassembly              Source
                                            	global		sipo
                                            
                                            	udata
-                                           NBYTES	res		1
+                                           COUNT	res		1
                                            
                                            libsp	code
                                            sipo:
 000002   3000     movlw	0                  	movlw		.0
-000003   20a5     call	0xa5                	call		mv_w_tx
+                                           ;;	.direct		"c", "U1.rx"
+000003   20a7     call	0xa7                	call		mv_w_tx
+                                           ;;	.direct		"c", "U1.tx=0x02"
 000004   2024     call	0x24                	call		mv_rx_w
-000005   00a0     movwf	0x20               	movwf		NBYTES
+000005   00a0     movwf	0x20               	movwf		COUNT
 000006   3a00     xorlw	0                  	xorlw		.0
 000007   1903     btfsc	0x3, 0x2           	skpnz
 000008   2811     goto	0x11                	goto		finish
-000009   20b4     call	0xb4                	call		clear_sipo
+000009   20b6     call	0xb6                	call		clear_sipo
                                            ser_out:
 00000a   3001     movlw	0x1                	movlw		.1
-00000b   20a5     call	0xa5                	call		mv_w_tx
+                                           ;;	.direct		"c", "U1.rx"
+00000b   20a7     call	0xa7                	call		mv_w_tx
+                                           ;;	.direct		"c", "U1.tx=0xF0"
 00000c   2024     call	0x24                	call		mv_rx_w
-00000d   2039     call	0x39                	call		mv_w_sipo
-00000e   0ba0     decfsz	0x20, f           	decfsz		NBYTES,1
+00000d   203b     call	0x3b                	call		mv_w_sipo
+00000e   0ba0     decfsz	0x20, f           	decfsz		COUNT,1
 00000f   280a     goto	0xa                 	goto		ser_out
-000010   20e2     call	0xe2                	call		load_sipo
+000010   20e4     call	0xe4                	call		load_sipo
                                            finish:
 000011   0008     return                   	return
                                            	end
@@ -121,9 +125,9 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            set_ports:
-000012   20ad     call	0xad                	call		set_anselh_ansel	;;	<< Initial pinout / EUSART settings
+000012   20af     call	0xaf                	call		set_anselh_ansel	;;	<< Initial pinout / EUSART settings
 000013   2016     call	0x16                	call		set_pinout_tris		;;	<<
-000014   20c3     call	0xc3                	call		set_eusart_19200	;;	<<
+000014   20c5     call	0xc5                	call		set_eusart_19200	;;	<<
 000015   0008     return                   	return
                                            	end
                                            	processor	pic16f690
@@ -193,25 +197,27 @@ Address  Value    Disassembly              Source
                                            	global		piso
                                            
                                            	udata
-                                           NBYTES	res		1
+                                           COUNT	res		1
                                            
                                            libsp	code
                                            piso:
 00002c   3002     movlw	0x2                	movlw		.2
-00002d   20a5     call	0xa5                	call		mv_w_tx
+00002d   20a7     call	0xa7                	call		mv_w_tx
 00002e   2024     call	0x24                	call		mv_rx_w
-00002f   00a1     movwf	0x21               	movwf		NBYTES
+00002f   00a1     movwf	0x21               	movwf		COUNT
 000030   3a00     xorlw	0                  	xorlw		.0
 000031   1903     btfsc	0x3, 0x2           	skpnz
-000032   2838     goto	0x38                	goto		finish
-000033   20ba     call	0xba                	call		load_piso
+000032   283a     goto	0x3a                	goto		finish
+000033   20bc     call	0xbc                	call		load_piso
                                            ser_in:
-000034   206f     call	0x6f                	call		mv_piso_w
-000035   20a5     call	0xa5                	call		mv_w_tx
-000036   0ba1     decfsz	0x21, f           	decfsz		NBYTES,1
-000037   2834     goto	0x34                	goto		ser_in
+000034   2071     call	0x71                	call		mv_piso_w
+000035   20a7     call	0xa7                	call		mv_w_tx
+000036   1283     bcf	0x3, 0x5             	banksel		COUNT
+000037   1303     bcf	0x3, 0x6             
+000038   0ba1     decfsz	0x21, f           	decfsz		COUNT,1
+000039   2834     goto	0x34                	goto		ser_in
                                            finish:
-000038   0008     return                   	return
+00003a   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -234,29 +240,29 @@ Address  Value    Disassembly              Source
                                            ;;	RA5	2	O	DOSIPO	Ser data out
                                            ;;	RA4	3	O	CKSIPO	Clock out
                                            
-000039   1283     bcf	0x3, 0x5             	banksel		PORTA		;;	<< Prepare to send synchronous data
-00003a   1303     bcf	0x3, 0x6             
-00003b   1285     bcf	0x5, 0x5             	bcf		PORTA,5		;;	<< through DOSIPO with CKSIPO.
-00003c   1205     bcf	0x5, 0x4             	bcf		PORTA,4		;;	<<
+00003b   1283     bcf	0x3, 0x5             	banksel		PORTA		;;	<< Prepare to send synchronous data
+00003c   1303     bcf	0x3, 0x6             
+00003d   1285     bcf	0x5, 0x5             	bcf		PORTA,5		;;	<< through DOSIPO with CKSIPO.
+00003e   1205     bcf	0x5, 0x4             	bcf		PORTA,4		;;	<<
                                            
-00003d   00a2     movwf	0x22               	movwf		TOSIPO		;;	<< Move the contents of WREG to TOSIPO
+00003f   00a2     movwf	0x22               	movwf		TOSIPO		;;	<< Move the contents of WREG to TOSIPO
                                            					;;	   to transmit it synchronously
                                            
                                            i = 8					;;	<< Begin synchronous transmission loop
                                            	while		i > 0		;;	<< of 8 bits.
                                            
-00003e   1ba2     btfsc	0x22, 0x7          	btfsc		TOSIPO,i-1	;;	<< If bit i-1 is 0, clear DOSIPO, else
-00003f   1685     bsf	0x5, 0x5             	bsf		PORTA,5		;;	<< set DOSIPO.
-000040   1fa2     btfss	0x22, 0x7          	btfss		TOSIPO,i-1	;;	<<
-000041   1285     bcf	0x5, 0x5             	bcf		PORTA,5		;;	<<
+000040   1ba2     btfsc	0x22, 0x7          	btfsc		TOSIPO,i-1	;;	<< If bit i-1 is 0, clear DOSIPO, else
+000041   1685     bsf	0x5, 0x5             	bsf		PORTA,5		;;	<< set DOSIPO.
+000042   1fa2     btfss	0x22, 0x7          	btfss		TOSIPO,i-1	;;	<<
+000043   1285     bcf	0x5, 0x5             	bcf		PORTA,5		;;	<<
                                            
-000042   1605     bsf	0x5, 0x4             	bsf		PORTA,4		;;	<< Push DOSIPO bit into the SIPO shift
-000043   1205     bcf	0x5, 0x4             	bcf		PORTA,4		;;	<< register with a pulse on CKSIPO
+000044   1605     bsf	0x5, 0x4             	bsf		PORTA,4		;;	<< Push DOSIPO bit into the SIPO shift
+000045   1205     bcf	0x5, 0x4             	bcf		PORTA,4		;;	<< register with a pulse on CKSIPO
                                            
                                            i -= 1					;;	<< End synchronous transmission loop 
                                            	endw				;;	<<
                                            
-00006e   0008     return                   	return
+000070   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -278,29 +284,29 @@ Address  Value    Disassembly              Source
                                            ;;	RA0	19	I	DIPISO	Ser data in
                                            ;;	RA2	17	O	CKPISO	Clock out
                                            
-00006f   1283     bcf	0x3, 0x5             	banksel		PORTA		;;	<< Prepare for synchronous reception of
-000070   1303     bcf	0x3, 0x6             
-000071   1005     bcf	0x5, 0               	bcf		PORTA,0		;;	<< data through DIPISO with CKPISO
-000072   1105     bcf	0x5, 0x2             	bcf		PORTA,2		;;	<<
+000071   1283     bcf	0x3, 0x5             	banksel		PORTA		;;	<< Prepare for synchronous reception of
+000072   1303     bcf	0x3, 0x6             
+000073   1005     bcf	0x5, 0               	bcf		PORTA,0		;;	<< data through DIPISO with CKPISO
+000074   1105     bcf	0x5, 0x2             	bcf		PORTA,2		;;	<<
                                            
                                            i=0					;;	<< Begin synchronous reception loop
                                            	while		i < 8		;;	<< of 8 bits.
                                            
-000073   1805     btfsc	0x5, 0             	btfsc		PORTA,0		;;	<< If DIPISO is 0, clear bit i from
-000074   1423     bsf	0x23, 0              	bsf		FRMPISO,i	;;	<< FRMPISO. Else, set bit i.
-000075   1c05     btfss	0x5, 0             	btfss		PORTA,0		;;	<<
-000076   1023     bcf	0x23, 0              	bcf		FRMPISO,i	;;	<<
+000075   1805     btfsc	0x5, 0             	btfsc		PORTA,0		;;	<< If DIPISO is 0, clear bit i from
+000076   1423     bsf	0x23, 0              	bsf		FRMPISO,i	;;	<< FRMPISO. Else, set bit i.
+000077   1c05     btfss	0x5, 0             	btfss		PORTA,0		;;	<<
+000078   1023     bcf	0x23, 0              	bcf		FRMPISO,i	;;	<<
                                            
-000077   1505     bsf	0x5, 0x2             	bsf		PORTA,2		;;	<< Pop next bit from PISO into DIPISO
-000078   1105     bcf	0x5, 0x2             	bcf		PORTA,2		;;	<< with a pulse on CKPISO
+000079   1505     bsf	0x5, 0x2             	bsf		PORTA,2		;;	<< Pop next bit from PISO into DIPISO
+00007a   1105     bcf	0x5, 0x2             	bcf		PORTA,2		;;	<< with a pulse on CKPISO
                                            
                                            i += 1					;;	<< End synchronous reception loop
                                            	endw				;;	<<
                                            
-0000a3   0823     movf	0x23, w             	movfw		FRMPISO		;;	<< Move stored PISO byte from FMPISO
+0000a5   0823     movf	0x23, w             	movfw		FRMPISO		;;	<< Move stored PISO byte from FMPISO
                                            					;;	   to WREG
                                            
-0000a4   0008     return                   	return
+0000a6   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -312,15 +318,15 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            mv_w_tx:
-0000a5   1283     bcf	0x3, 0x5             	banksel		TXREG		;;	<< Move the contents of WREG to TXREG
-0000a6   1303     bcf	0x3, 0x6             
-0000a7   0099     movwf	0x19               	movwf		TXREG		;;	<<
+0000a7   1283     bcf	0x3, 0x5             	banksel		TXREG		;;	<< Move the contents of WREG to TXREG
+0000a8   1303     bcf	0x3, 0x6             
+0000a9   0099     movwf	0x19               	movwf		TXREG		;;	<<
                                            
-0000a8   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< Pause execution until TRMT (TXSTA,1)
-0000a9   1303     bcf	0x3, 0x6             
-0000aa   1c98     btfss	0x18, 0x1          	btfss		TXSTA,1		;;	<< is set again. i.e. until the byte
-0000ab   28aa     goto	0xaa                	goto		$-1		;;	<< transmission completes
-0000ac   0008     return                   	return
+0000aa   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< Pause execution until TRMT (TXSTA,1)
+0000ab   1303     bcf	0x3, 0x6             
+0000ac   1c98     btfss	0x18, 0x1          	btfss		TXSTA,1		;;	<< is set again. i.e. until the byte
+0000ad   28ac     goto	0xac                	goto		$-1		;;	<< transmission completes
+0000ae   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -332,13 +338,13 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            set_anselh_ansel:
-0000ad   1283     bcf	0x3, 0x5             	banksel		ANSEL		;;	<< ANSELH:ANSEL Settings
-0000ae   1703     bsf	0x3, 0x6             
-0000af   019e     clrf	0x1e                	clrf		ANSEL		;;	<<
-0000b0   1283     bcf	0x3, 0x5             	banksel		ANSELH		;;	<<
-0000b1   1703     bsf	0x3, 0x6             
-0000b2   019f     clrf	0x1f                	clrf		ANSELH		;;	<<
-0000b3   0008     return                   	return
+0000af   1283     bcf	0x3, 0x5             	banksel		ANSEL		;;	<< ANSELH:ANSEL Settings
+0000b0   1703     bsf	0x3, 0x6             
+0000b1   019e     clrf	0x1e                	clrf		ANSEL		;;	<<
+0000b2   1283     bcf	0x3, 0x5             	banksel		ANSELH		;;	<<
+0000b3   1703     bsf	0x3, 0x6             
+0000b4   019f     clrf	0x1f                	clrf		ANSELH		;;	<<
+0000b5   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -350,12 +356,12 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            clear_sipo:
-0000b4   1283     bcf	0x3, 0x5             	banksel		PORTC
-0000b5   1303     bcf	0x3, 0x6             
-0000b6   1607     bsf	0x7, 0x4             	bsf		PORTC,4
-0000b7   1207     bcf	0x7, 0x4             	bcf		PORTC,4
+0000b6   1283     bcf	0x3, 0x5             	banksel		PORTC
+0000b7   1303     bcf	0x3, 0x6             
 0000b8   1607     bsf	0x7, 0x4             	bsf		PORTC,4
-0000b9   0008     return                   	return
+0000b9   1207     bcf	0x7, 0x4             	bcf		PORTC,4
+0000ba   1607     bsf	0x7, 0x4             	bsf		PORTC,4
+0000bb   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -367,15 +373,15 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            load_piso:
-0000ba   1283     bcf	0x3, 0x5             	banksel		PORTC
-0000bb   1303     bcf	0x3, 0x6             
-0000bc   1007     bcf	0x7, 0               	bcf		PORTC,0
-0000bd   1407     bsf	0x7, 0               	bsf		PORTC,0
+0000bc   1283     bcf	0x3, 0x5             	banksel		PORTC
+0000bd   1303     bcf	0x3, 0x6             
 0000be   1007     bcf	0x7, 0               	bcf		PORTC,0
-0000bf   1507     bsf	0x7, 0x2             	bsf		PORTC,2
-0000c0   1107     bcf	0x7, 0x2             	bcf		PORTC,2
+0000bf   1407     bsf	0x7, 0               	bsf		PORTC,0
+0000c0   1007     bcf	0x7, 0               	bcf		PORTC,0
 0000c1   1507     bsf	0x7, 0x2             	bsf		PORTC,2
-0000c2   0008     return                   	return
+0000c2   1107     bcf	0x7, 0x2             	bcf		PORTC,2
+0000c3   1507     bsf	0x7, 0x2             	bsf		PORTC,2
+0000c4   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -387,38 +393,38 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            set_eusart_19200:
-0000c3   1283     bcf	0x3, 0x5             	banksel		INTCON		;;	<< These settings configure interrupt
-0000c4   1303     bcf	0x3, 0x6             
-0000c5   138b     bcf	0xb, 0x7             	bcf		INTCON,7	;;	<< functions for the PIC16F690 EUSART.
-0000c6   130b     bcf	0xb, 0x6             	bcf		INTCON,6	;;	<<
-0000c7   1683     bsf	0x3, 0x5             	banksel		PIE1		;;	<<
-0000c8   1303     bcf	0x3, 0x6             
-0000c9   128c     bcf	0xc, 0x5             	bcf		PIE1,5		;;	<<
+0000c5   1283     bcf	0x3, 0x5             	banksel		INTCON		;;	<< These settings configure interrupt
+0000c6   1303     bcf	0x3, 0x6             
+0000c7   138b     bcf	0xb, 0x7             	bcf		INTCON,7	;;	<< functions for the PIC16F690 EUSART.
+0000c8   130b     bcf	0xb, 0x6             	bcf		INTCON,6	;;	<<
+0000c9   1683     bsf	0x3, 0x5             	banksel		PIE1		;;	<<
+0000ca   1303     bcf	0x3, 0x6             
+0000cb   128c     bcf	0xc, 0x5             	bcf		PIE1,5		;;	<<
                                            
-0000ca   1683     bsf	0x3, 0x5             	banksel		SPBRGH		;;	<< These settings assign the following
-0000cb   1303     bcf	0x3, 0x6             
-0000cc   019a     clrf	0x1a                	clrf		SPBRGH		;;	<< values to the PIC16F690 EUSART:
-0000cd   1683     bsf	0x3, 0x5             	banksel		SPBRG		;;	<<
-0000ce   1303     bcf	0x3, 0x6             
-0000cf   300c     movlw	0xc                	movlw		D'12'		;;	<< FOSC		= 4 MHz
-0000d0   0099     movwf	0x19               	movwf		SPBRG		;;	<< SYNC		= 0
-0000d1   1683     bsf	0x3, 0x5             	banksel		BAUDCTL		;;	<< BRGH		= 1
-0000d2   1303     bcf	0x3, 0x6             
-0000d3   119b     bcf	0x1b, 0x3            	bcf		BAUDCTL,3	;;	<< BRG16	= 0
-0000d4   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< SPBRGH:SPBRG	= 12
-0000d5   1303     bcf	0x3, 0x6             
-0000d6   1518     bsf	0x18, 0x2            	bsf		TXSTA,2		;;	<< BR           = 19200
-0000d7   1218     bcf	0x18, 0x4            	bcf		TXSTA,4		;;	<< ACTBR        = 19.23 k
-0000d8   1198     bcf	0x18, 0x3            	bcf		TXSTA,3		;;	<< ERROR        = 0.16 %
-0000d9   1698     bsf	0x18, 0x5            	bsf		TXSTA,5		;;	<<
-0000da   1318     bcf	0x18, 0x6            	bcf		TXSTA,6		;;	<<
-0000db   1283     bcf	0x3, 0x5             	banksel		RCSTA		;;	<<
-0000dc   1303     bcf	0x3, 0x6             
-0000dd   1198     bcf	0x18, 0x3            	bcf		RCSTA,3		;;	<<
-0000de   1618     bsf	0x18, 0x4            	bsf		RCSTA,4		;;	<<
-0000df   1318     bcf	0x18, 0x6            	bcf		RCSTA,6		;;	<<
-0000e0   1798     bsf	0x18, 0x7            	bsf		RCSTA,7		;;	<<
-0000e1   0008     return                   	return
+0000cc   1683     bsf	0x3, 0x5             	banksel		SPBRGH		;;	<< These settings assign the following
+0000cd   1303     bcf	0x3, 0x6             
+0000ce   019a     clrf	0x1a                	clrf		SPBRGH		;;	<< values to the PIC16F690 EUSART:
+0000cf   1683     bsf	0x3, 0x5             	banksel		SPBRG		;;	<<
+0000d0   1303     bcf	0x3, 0x6             
+0000d1   300c     movlw	0xc                	movlw		D'12'		;;	<< FOSC		= 4 MHz
+0000d2   0099     movwf	0x19               	movwf		SPBRG		;;	<< SYNC		= 0
+0000d3   1683     bsf	0x3, 0x5             	banksel		BAUDCTL		;;	<< BRGH		= 1
+0000d4   1303     bcf	0x3, 0x6             
+0000d5   119b     bcf	0x1b, 0x3            	bcf		BAUDCTL,3	;;	<< BRG16	= 0
+0000d6   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< SPBRGH:SPBRG	= 12
+0000d7   1303     bcf	0x3, 0x6             
+0000d8   1518     bsf	0x18, 0x2            	bsf		TXSTA,2		;;	<< BR           = 19200
+0000d9   1218     bcf	0x18, 0x4            	bcf		TXSTA,4		;;	<< ACTBR        = 19.23 k
+0000da   1198     bcf	0x18, 0x3            	bcf		TXSTA,3		;;	<< ERROR        = 0.16 %
+0000db   1698     bsf	0x18, 0x5            	bsf		TXSTA,5		;;	<<
+0000dc   1318     bcf	0x18, 0x6            	bcf		TXSTA,6		;;	<<
+0000dd   1283     bcf	0x3, 0x5             	banksel		RCSTA		;;	<<
+0000de   1303     bcf	0x3, 0x6             
+0000df   1198     bcf	0x18, 0x3            	bcf		RCSTA,3		;;	<<
+0000e0   1618     bsf	0x18, 0x4            	bsf		RCSTA,4		;;	<<
+0000e1   1318     bcf	0x18, 0x6            	bcf		RCSTA,6		;;	<<
+0000e2   1798     bsf	0x18, 0x7            	bsf		RCSTA,7		;;	<<
+0000e3   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -430,10 +436,10 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            load_sipo:
-0000e2   1283     bcf	0x3, 0x5             	banksel		PORTC
-0000e3   1303     bcf	0x3, 0x6             
-0000e4   1287     bcf	0x7, 0x5             	bcf		PORTC,5
-0000e5   1687     bsf	0x7, 0x5             	bsf		PORTC,5
+0000e4   1283     bcf	0x3, 0x5             	banksel		PORTC
+0000e5   1303     bcf	0x3, 0x6             
 0000e6   1287     bcf	0x7, 0x5             	bcf		PORTC,5
-0000e7   0008     return                   	return
+0000e7   1687     bsf	0x7, 0x5             	bsf		PORTC,5
+0000e8   1287     bcf	0x7, 0x5             	bcf		PORTC,5
+0000e9   0008     return                   	return
                                            	end
