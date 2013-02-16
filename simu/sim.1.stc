@@ -72,15 +72,15 @@
 #	.CP	I		SRCK	11	I	Serial LH CK
 #	.PL	I		~SRLOAD	13	I	LD2 low pulse
 #
-#NOTE: The TTL165 model is only roughly equivalent to the 74597 IC.
-#One difference between the 74165 and the 74597 is the fact that the 74597
-#has a Master Clear terminal, whereas the 74165 does not.
-#This is the most relevant difference between the two, since the MCLR is used
-#by the loopback_piso function to verify the number of daisychained 74597s.
+#	NOTE: The TTL165 model is only roughly equivalent to the 74595 IC.
+#	One difference between the 74165 and the 74597 is the fact that the 74597
+#	has a Master Clear terminal, whereas the 74165 does not.
+#	This is the most relevant difference between the two, since the MCLR is used
+#	by the loopback_piso function to verify the number of daisychained 74597s.
 #
-#The 74165 IC would be the correct equivalent.
-#This is the proper equivalency between the TTL165 model and the actual 74165
-#TI IC:
+#	The 74165 IC would be the correct equivalent.
+#	This is the proper equivalency between the TTL165 model and the actual 74165
+#	TI IC:
 #
 #	TTL165 gpsim module	IC 74165 PISO
 #	PIN	I/O		PORT	PIN #	I/O	FUNC
@@ -99,9 +99,9 @@
 #	.CP	I		CLK	2	I	Clock LH edge
 #	.PL	I		SH/~LD	1	I	Shift/~Load
 #
-#An finally, the proper equivalencies for the 74595:
+#	An finally, the proper equivalencies for the 74595:
 #
-#	TTL595 gpsim module	IC 74595 SIPO
+#	TTL595 gpsim module	IC 74597 PISO
 #	PIN	I/O		PORT	PIN #	I/O	FUNC
 #	.Q0	O		QA	15	O	A out channel
 #	.Q1	O		QB	1	O	B out channel
@@ -134,112 +134,21 @@ stimulus asy
 	name zero
 end
 
-# processor p16f690 Interface
-	p16f690.xpos = 336
-	p16f690.ypos = 48
-
 module library /usr/local/lib/libgpsim_modules.so
+p16f690 = Interface
+module load usart U1
+U1 = Control
+U1.console = true
+U1.txbaud = 19200
+U1.rxbaud = 19200
+U1.xpos = 72
+U1.ypos = 340
 
-module load usart Control
-	Control.console = true
-	Control.txbaud = 19200
-	Control.rxbaud = 19200
-	Control.xpos = 300
-	Control.ypos = 300
+node ctx_irx itx_crx
+attach ctx_irx U1.TXPIN portb5
+attach itx_crx portb7 U1.RXPIN
 
-	node ctx_irx itx_crx
-		attach ctx_irx Control.TXPIN portb5
-		attach itx_crx portb7 Control.RXPIN
-
-module load ttl595 SIPO2
-	SIPO2.xpos = 576
-	SIPO2.ypos = 276
-
-module load ttl595 SIPO1
-	SIPO1.xpos = 576
-	SIPO1.ypos = 60
-
-	node N_SRCLR_RC4 N_QH_SER N_SRCK_RA4 N_SER_RA5 N_RCK_RC5 N_G_ZERO
-		attach N_SRCLR_RC4 SIPO1.MR portc4
-		attach N_RCK_RC5 SIPO1.RCK portc5
-		attach N_SER_RA5 SIPO1.Ds porta5
-		attach N_SRCK_RA4 SIPO1.SCK porta4
-		attach N_QH_SER SIPO1.Qs SIPO2.Ds
-		attach N_G_ZERO SIPO1.OE zero
-	
-	module load led O1QA
-		O1QA.color = blue
-		O1QA.xpos = 744
-		O1QA.ypos = 216
-
-		node N_O1QA
-			attach N_O1QA O1QA.in SIPO1.Q0
-
-	module load led O1QB
-		O1QB.color = green
-		O1QB.xpos = 708
-		O1QB.ypos = 216
-
-		node N_O1QB
-			attach N_O1QB O1QB.in SIPO1.Q1
-
-	module load led O1QC
-		O1QC.color = yellow
-		O1QC.xpos = 672
-		O1QC.ypos = 216
-
-		node N_O1QC
-			attach N_O1QC O1QC.in SIPO1.Q2
-
-	module load led O1QD
-		O1QD.color = red
-		O1QD.xpos = 636
-		O1QD.ypos = 216
-
-		node N_O1QD
-			attach N_O1QD O1QD.in SIPO1.Q3
-
-	module load led O1QE
-		O1QE.color = blue
-		O1QE.xpos = 600
-		O1QE.ypos = 216
-
-		node N_O1QE
-			attach N_O1QE O1QE.in SIPO1.Q4
-
-	module load led O1QF
-		O1QF.color = green
-		O1QF.xpos = 564
-		O1QF.ypos = 216
-
-		node N_O1QF
-			attach N_O1QF O1QF.in SIPO1.Q5
-
-	module load led O1QG
-		O1QG.color = yellow
-		O1QG.xpos = 528
-		O1QG.ypos = 216
-
-		node N_O1QG
-			attach N_O1QG O1QG.in SIPO1.Q6
-
-	module load led O1QH
-		O1QH.color = red
-		O1QH.xpos = 492
-		O1QH.ypos = 216
-
-		node N_O1QH
-			attach N_O1QH O1QH.in SIPO1.Q7
-
-module load ttl165 PISO1
-	PISO1.xpos = 72
-	PISO1.ypos = 60
-	
-module load ttl165 PISO2
-	PISO2.xpos = 72
-	PISO2.ypos = 276
-	
-#	SIPO scope
+#	SIPO
 scope.ch0 = "porta5"
 scope.ch1 = "porta4"
 scope.ch2 = "portc5"

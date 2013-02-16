@@ -159,77 +159,20 @@ module load ttl595 SIPO1
 	SIPO1.xpos = 576
 	SIPO1.ypos = 60
 
-	node N_SRCLR_RC4 N_QH_SER N_SRCK_RA4 N_SER_RA5 N_RCK_RC5 N_G_ZERO
+	node N_SRCLR_RC4 N_QH_SER N_SRCK_RA4 N_SER_RA5 N_RCK_RC5
 		attach N_SRCLR_RC4 SIPO1.MR portc4
 		attach N_RCK_RC5 SIPO1.RCK portc5
-		attach N_SER_RA5 SIPO1.Ds porta5
+		attach N_SER_RC5 SIPO1.Ds porta5
 		attach N_SRCK_RA4 SIPO1.SCK porta4
 		attach N_QH_SER SIPO1.Qs SIPO2.Ds
-		attach N_G_ZERO SIPO1.OE zero
 	
 	module load led O1QA
-		O1QA.color = blue
-		O1QA.xpos = 744
+		O1QA.color = green
+		O1QA.xpos = 456
 		O1QA.ypos = 216
 
 		node N_O1QA
 			attach N_O1QA O1QA.in SIPO1.Q0
-
-	module load led O1QB
-		O1QB.color = green
-		O1QB.xpos = 708
-		O1QB.ypos = 216
-
-		node N_O1QB
-			attach N_O1QB O1QB.in SIPO1.Q1
-
-	module load led O1QC
-		O1QC.color = yellow
-		O1QC.xpos = 672
-		O1QC.ypos = 216
-
-		node N_O1QC
-			attach N_O1QC O1QC.in SIPO1.Q2
-
-	module load led O1QD
-		O1QD.color = red
-		O1QD.xpos = 636
-		O1QD.ypos = 216
-
-		node N_O1QD
-			attach N_O1QD O1QD.in SIPO1.Q3
-
-	module load led O1QE
-		O1QE.color = blue
-		O1QE.xpos = 600
-		O1QE.ypos = 216
-
-		node N_O1QE
-			attach N_O1QE O1QE.in SIPO1.Q4
-
-	module load led O1QF
-		O1QF.color = green
-		O1QF.xpos = 564
-		O1QF.ypos = 216
-
-		node N_O1QF
-			attach N_O1QF O1QF.in SIPO1.Q5
-
-	module load led O1QG
-		O1QG.color = yellow
-		O1QG.xpos = 528
-		O1QG.ypos = 216
-
-		node N_O1QG
-			attach N_O1QG O1QG.in SIPO1.Q6
-
-	module load led O1QH
-		O1QH.color = red
-		O1QH.xpos = 492
-		O1QH.ypos = 216
-
-		node N_O1QH
-			attach N_O1QH O1QH.in SIPO1.Q7
 
 module load ttl165 PISO1
 	PISO1.xpos = 72

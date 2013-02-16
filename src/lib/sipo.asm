@@ -15,9 +15,9 @@ COUNT	res		1
 libsp	code
 sipo:
 	movlw		.0
-;;	.direct		"c", "U1.rx"
+	.direct		"c", "Control.rx"
 	call		mv_w_tx
-;;	.direct		"c", "U1.tx=0x02"
+	.direct		"c", "Control.tx = 0x02"
 	call		mv_rx_w
 	movwf		COUNT
 	xorlw		.0
@@ -26,9 +26,9 @@ sipo:
 	call		clear_sipo
 ser_out:
 	movlw		.1
-;;	.direct		"c", "U1.rx"
+	.direct		"c", "Control.rx"
 	call		mv_w_tx
-;;	.direct		"c", "U1.tx=0xF0"
+	.direct		"c", "Control.tx = 0xF0"
 	call		mv_rx_w
 	call		mv_w_sipo
 	decfsz		COUNT,1

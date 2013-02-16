@@ -8,7 +8,7 @@ PORT	PIN	I/O	FUNC		| PORT	PIN	I/O	NAME	FUNC
 ~SRCLR	10	I	CLR low pulse	| RC4	6	O	CRSIPO	Clear out
 RCK	12	I	LD high pulse	| RC5	5	O	LDSIPO	Load D out
 SER	14	I	Serial in	| RA5	2	O	DOSIPO	Ser data out
-SRCK	11	I	Serial in CK	| RA4	3	O	CKSIPO	Clock out
+SRCK	11	I	Serial LH CK	| RA4	3	O	CKSIPO	Clock out
 QH'	9	O	Serial out	| RA3	4	I	DISIPO	Ser data in
 					|-------------------------------------------
 					| Set to VCC or GND
@@ -32,9 +32,9 @@ IC 74597 PISO				| PIC16F690
 PORT	PIN	I/O	FUNC		| PORT	PIN	I/O	NAME	FUNC
 ~SRCLR	10	I	CLR low pulse	| RC1	15	O	CRPISO	Clear out
 RCK	12	I	LD1 high pulse	| RC0	16	O	LD1PISO	Load D1 out
-~SRLOAD	13	I	LD2 high pulse	| RC2	14	O	LD2PISO	Load D2 out
+~SRLOAD	13	I	LD2 low pulse	| RC2	14	O	LD2PISO	Load D2 out
 SER	14	I	Serial in	| RA1	18	O	DOPISO	Ser data out
-SRCK	11	I	Serial in CK	| RA2	17	O	CKPISO	Clock out
+SRCK	11	I	Serial LH CK	| RA2	17	O	CKPISO	Clock out
 QH'	9	O	Serial out	| RA0	19	I	DIPISO	Ser data in
 					|-------------------------------------------
 					| Set to VCC or GND

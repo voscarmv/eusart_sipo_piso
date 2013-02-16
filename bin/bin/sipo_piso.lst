@@ -1,6 +1,6 @@
 gplink-0.13.7 beta
 Copyright (c) 1998-2005 gputils project
-Listing File Generated: 2-12-2013  12:30:00
+Listing File Generated: 2-15-2013  19:24:48
  
  
 Address  Value    Disassembly              Source
@@ -89,9 +89,9 @@ Address  Value    Disassembly              Source
                                            libsp	code
                                            sipo:
 000002   3000     movlw	0                  	movlw		.0
-                                           ;;	.direct		"c", "U1.rx"
+                                           	.direct		"c", "Control.rx"
 000003   20a7     call	0xa7                	call		mv_w_tx
-                                           ;;	.direct		"c", "U1.tx=0x02"
+                                           	.direct		"c", "Control.tx = 0x02"
 000004   2024     call	0x24                	call		mv_rx_w
 000005   00a0     movwf	0x20               	movwf		COUNT
 000006   3a00     xorlw	0                  	xorlw		.0
@@ -100,9 +100,9 @@ Address  Value    Disassembly              Source
 000009   20b6     call	0xb6                	call		clear_sipo
                                            ser_out:
 00000a   3001     movlw	0x1                	movlw		.1
-                                           ;;	.direct		"c", "U1.rx"
+                                           	.direct		"c", "Control.rx"
 00000b   20a7     call	0xa7                	call		mv_w_tx
-                                           ;;	.direct		"c", "U1.tx=0xF0"
+                                           	.direct		"c", "Control.tx = 0xF0"
 00000c   2024     call	0x24                	call		mv_rx_w
 00000d   203b     call	0x3b                	call		mv_w_sipo
 00000e   0ba0     decfsz	0x20, f           	decfsz		COUNT,1

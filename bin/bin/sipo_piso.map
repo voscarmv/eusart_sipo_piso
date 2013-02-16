@@ -1,5 +1,5 @@
 gplink-0.13.7 beta
-Map File - Created 2-12-2013  12:30:00
+Map File - Created 2-15-2013  19:24:48
  
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
@@ -26,7 +26,11 @@ Map File - Created 2-12-2013  12:30:00
                      main   0x0000ea    program     static src/bin/main_sipo_piso.asm
                     COUNT   0x000020       data     static ./src/lib/sipo.asm
                      sipo   0x000002    program     extern ./src/lib/sipo.asm
+                  .direct   0x000003    program     static ./src/lib/sipo.asm
+                  .direct   0x000004    program     static ./src/lib/sipo.asm
                   ser_out   0x00000a    program     static ./src/lib/sipo.asm
+                  .direct   0x00000b    program     static ./src/lib/sipo.asm
+                  .direct   0x00000c    program     static ./src/lib/sipo.asm
                    finish   0x000011    program     static ./src/lib/sipo.asm
                 set_ports   0x000012    program     extern ./src/lib/set_ports.asm
           set_pinout_tris   0x000016    program     extern ./src/lib/set_pinout_tris.asm
