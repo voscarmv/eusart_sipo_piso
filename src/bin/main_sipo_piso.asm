@@ -18,4 +18,6 @@ prog	code
 main:
 	call		sipo
 	call		piso
+aa:
+	goto		aa
 	end

@@ -16,6 +16,7 @@ libsp	code
 piso:
 	movlw		.2
 	call		mv_w_tx
+	.direct		"c","Control.tx = 0x02"
 	call		mv_rx_w
 	movwf		COUNT
 	xorlw		.0
@@ -27,6 +28,7 @@ ser_in:
 	call		mv_w_tx
 	banksel		COUNT
 	decfsz		COUNT,1
+	.direct		"c","Control.rx"
 	goto		ser_in
 finish:
 	return

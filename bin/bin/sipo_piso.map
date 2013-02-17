@@ -1,12 +1,12 @@
 gplink-0.13.7 beta
-Map File - Created 2-15-2013  19:24:48
+Map File - Created 2-17-2013  00:52:19
  
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
                 ---------  ---------  ---------  ---------  ---------
                     start       code   00000000    program   0x000004
                     libsp       code   0x000002    program   0x0001d0
-                     prog       code   0x0000ea    program   0x000004
+                     prog       code   0x0000ea    program   0x000006
                   .config       code   0x002007    program   0x000002
                    .udata      udata   0x000020       data   0x000004
  
@@ -15,15 +15,16 @@ Map File - Created 2-15-2013  19:24:48
                            ---------   ---------
                             0x002007    0x002007
                             00000000    0x000001
-                            0x0000ea    0x0000eb
+                            0x0000ea    0x0000ec
                             0x000002    0x0000e9
  
-                            237 program addresses used
+                            238 program addresses used
  
                               Symbols
                      Name    Address   Location    Storage File
                 ---------  ---------  ---------  --------- ---------
                      main   0x0000ea    program     static src/bin/main_sipo_piso.asm
+                       aa   0x0000ec    program     static src/bin/main_sipo_piso.asm
                     COUNT   0x000020       data     static ./src/lib/sipo.asm
                      sipo   0x000002    program     extern ./src/lib/sipo.asm
                   .direct   0x000003    program     static ./src/lib/sipo.asm
@@ -38,7 +39,9 @@ Map File - Created 2-15-2013  19:24:48
             _libsp_000003   0x000027    program     static ./src/lib/mv_rx_w.asm
                     COUNT   0x000021       data     static ./src/lib/piso.asm
                      piso   0x00002c    program     extern ./src/lib/piso.asm
+                  .direct   0x00002e    program     static ./src/lib/piso.asm
                    ser_in   0x000034    program     static ./src/lib/piso.asm
+                  .direct   0x000039    program     static ./src/lib/piso.asm
                    finish   0x00003a    program     static ./src/lib/piso.asm
                    TOSIPO   0x000022       data     static ./src/lib/mv_w_sipo.asm
                 mv_w_sipo   0x00003b    program     extern ./src/lib/mv_w_sipo.asm

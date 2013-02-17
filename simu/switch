@@ -1,0 +1,15 @@
+	module load switch I1A
+		I1A.xpos = 432
+		I1A.ypos = 204
+
+		module load pullup U1A
+			U1A.xpos = 48
+			U1A.ypos = 504
+
+		module load pulldown D1A
+			D1A.xpos = 48
+			D1A.ypos = 564
+
+		node N_I1_A_PU N_I1_A_PD
+			attach N_I1_A_PU U1A.pin I1A.A
+			attach N_I1_A_PD D1A.pin I1A.B PISO1.D0

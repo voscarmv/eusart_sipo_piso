@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-12-2013  12:27:27          PAGE  1
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-17-2013  00:52:19          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -25,21 +25,23 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0000 00016 piso:
 0000 3002      00017         movlw           .2
 0001 2000      00018         call            mv_w_tx
-0002 2000      00019         call            mv_rx_w
-0003 0080      00020         movwf           COUNT
-0004 3A00      00021         xorlw           .0
-0005 1903      00022         skpnz
-0006 2800      00023         goto            finish
-0007 2000      00024         call            load_piso
-0008 00025 ser_in:
-0008 2000      00026         call            mv_piso_w
-0009 2000      00027         call            mv_w_tx
-000A 0000 0000 00028         banksel         COUNT
-000C 0B80      00029         decfsz          COUNT,1
-000D 2800      00030         goto            ser_in
-000E 00031 finish:
-000E 0008      00032         return
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-12-2013  12:27:27          PAGE  2
+               00019         .direct         "c","Control.tx = 0x02"
+0002 2000      00020         call            mv_rx_w
+0003 0080      00021         movwf           COUNT
+0004 3A00      00022         xorlw           .0
+0005 1903      00023         skpnz
+0006 2800      00024         goto            finish
+0007 2000      00025         call            load_piso
+0008 00026 ser_in:
+0008 2000      00027         call            mv_piso_w
+0009 2000      00028         call            mv_w_tx
+000A 0000 0000 00029         banksel         COUNT
+000C 0B80      00030         decfsz          COUNT,1
+               00031         .direct         "c","Control.rx"
+000D 2800      00032         goto            ser_in
+000E 00033 finish:
+000E 0008      00034         return
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-17-2013  00:52:19          PAGE  2
 
 
 SYMBOL TABLE
@@ -98,7 +100,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-12-2013  12:27:27          PAGE  3
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-17-2013  00:52:19          PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -158,7 +160,7 @@ ECCPASE                           00000007
 EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-12-2013  12:27:27          PAGE  4
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-17-2013  00:52:19          PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -218,7 +220,7 @@ NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-12-2013  12:27:27          PAGE  5
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-17-2013  00:52:19          PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -278,7 +280,7 @@ RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-12-2013  12:27:27          PAGE  6
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-17-2013  00:52:19          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -338,7 +340,7 @@ T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-12-2013  12:27:27          PAGE  7
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-17-2013  00:52:19          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -398,7 +400,7 @@ TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-12-2013  12:27:27          PAGE  8
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-17-2013  00:52:19          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -458,7 +460,7 @@ _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-12-2013  12:27:27          PAGE  9
+gpasm-0.13.7 beta               ./src/lib/piso.asm2-17-2013  00:52:19          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
