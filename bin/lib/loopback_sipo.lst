@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-18-2013  16:57:30          PAGE  1
+gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-19-2013  18:55:53          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -25,26 +25,30 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0000 00016 loopback_sipo:
 0000 3005      00017         movlw           .5              ;;      << Prompt
 0001 2000      00018         call            mv_w_tx
-0002 2000      00019         call            mv_rx_w
-0003 0080      00020         movwf           COUNT
-0004 3A00      00021         xorlw           .0
-0005 1903      00022         skpnz
-0006 2800      00023         goto            finish
-0007 2000      00024         call            clear_sipo
-0008 00025 push:
-0008 3006      00026         movlw           .6              ;;      << Prompt
-0009 2000      00027         call            mv_w_tx
-000A 2000      00028         call            mv_rx_w
-000B 2000      00029         call            push_w_sipo
-000C 2000      00030         call            pop_sipo_w
-000D 2000      00031         call            mv_w_tx
-000E 0000 0000 00032         banksel         COUNT
-0010 0B80      00033         decfsz          COUNT,1
-0011 2800      00034         goto            push
-               00035 ;;      goto            loopback_sipo
-0012 00036 finish:
-0012 0008      00037         return
-gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-18-2013  16:57:30          PAGE  2
+               00019         .direct         "c","Control.rx"
+               00020         .direct         "c","Control.tx = 0x03"
+0002 2000      00021         call            mv_rx_w
+0003 0080      00022         movwf           COUNT
+0004 3A00      00023         xorlw           .0
+0005 1903      00024         skpnz
+0006 2800      00025         goto            finish
+0007 2000      00026         call            clear_sipo
+0008 00027 push:
+0008 3006      00028         movlw           .6              ;;      << Prompt
+0009 2000      00029         call            mv_w_tx
+               00030         .direct         "c","Control.rx"
+               00031         .direct         "c","Control.tx = 0xF8"
+000A 2000      00032         call            mv_rx_w
+000B 2000      00033         call            push_w_sipo
+000C 2000      00034         call            pop_sipo_w
+000D 2000      00035         call            mv_w_tx
+000E 0000 0000 00036         banksel         COUNT
+0010 0B80      00037         decfsz          COUNT,1
+0011 2800      00038         goto            push
+               00039 ;;      goto            loopback_sipo
+0012 00040 finish:
+0012 0008      00041         return
+gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-19-2013  18:55:53          PAGE  2
 
 
 SYMBOL TABLE
@@ -103,7 +107,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-18-2013  16:57:30          PAGE  3
+gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-19-2013  18:55:53          PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -163,7 +167,7 @@ ECCPASE                           00000007
 EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
-gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-18-2013  16:57:30          PAGE  4
+gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-19-2013  18:55:53          PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -223,7 +227,7 @@ NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-18-2013  16:57:30          PAGE  5
+gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-19-2013  18:55:53          PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -283,7 +287,7 @@ RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-18-2013  16:57:30          PAGE  6
+gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-19-2013  18:55:53          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -343,7 +347,7 @@ T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-18-2013  16:57:30          PAGE  7
+gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-19-2013  18:55:53          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -403,7 +407,7 @@ TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-18-2013  16:57:30          PAGE  8
+gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-19-2013  18:55:53          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -463,7 +467,7 @@ _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-18-2013  16:57:30          PAGE  9
+gpasm-0.13.7 beta               ./src/lib/loopback_sipo.asm2-19-2013  18:55:53          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT

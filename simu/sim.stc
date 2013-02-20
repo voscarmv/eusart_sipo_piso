@@ -141,7 +141,7 @@ end
 module library /usr/local/lib/libgpsim_modules.so
 
 module load usart Control
-	Control.console = true
+	Control.console = false
 	Control.txbaud = 19200
 	Control.rxbaud = 19200
 	Control.xpos = 300
@@ -317,7 +317,7 @@ module load ttl165 PISO2
 	PISO2.ypos = 276
 
 	module load switch I2A
-		I2A.state = true
+		I2A.state = false
 		I2A.xpos = 432
 		I2A.ypos = 420
 
@@ -334,7 +334,7 @@ module load ttl165 PISO2
 			attach N_I2_A_PD D2A.pin I2A.B PISO2.D0
 
 	module load switch I2B
-		I2B.state = true
+		I2B.state = false
 		I2B.xpos = 372
 		I2B.ypos = 420
 
@@ -351,7 +351,7 @@ module load ttl165 PISO2
 			attach N_I2_B_PD D2B.pin I2B.B PISO2.D1
 
 	module load switch I2C
-		I2C.state = true
+		I2C.state = false
 		I2C.xpos = 312
 		I2C.ypos = 420
 
@@ -385,7 +385,7 @@ module load ttl165 PISO2
 			attach N_I2_D_PD D2D.pin I2D.B PISO2.D3
 
 	module load switch I2E
-		I2E.state = true
+		I2E.state = false
 		I2E.xpos = 192
 		I2E.ypos = 420
 
@@ -419,7 +419,7 @@ module load ttl165 PISO2
 			attach N_I2_F_PD D2F.pin I2F.B PISO2.D5
 
 	module load switch I2G
-		I2G.state = true
+		I2G.state = false
 		I2G.xpos = 72
 		I2G.ypos = 420
 
@@ -436,7 +436,7 @@ module load ttl165 PISO2
 			attach N_I2_G_PD D2G.pin I2G.B PISO2.D6
 
 	module load switch I2H
-		I2G.state = false
+		I2H.state = false
 		I2H.xpos = 12
 		I2H.ypos = 420
 
@@ -470,7 +470,7 @@ module load ttl165 PISO1
 #		I1A.ypos = 180
 
 	module load switch I1A
-		I1A.state = true
+		I1A.state = false
 		I1A.xpos = 432
 		I1A.ypos = 204
 
@@ -490,7 +490,7 @@ module load ttl165 PISO1
 #		attach N_I1_A_PD D1A.pin S1A.B PISO1.D0 I1A.in
 
 	module load switch I1B
-		I1B.state = true
+		I1B.state = false
 		I1B.xpos = 372
 		I1B.ypos = 204
 
@@ -524,7 +524,7 @@ module load ttl165 PISO1
 			attach N_I1_C_PD D1C.pin I1C.B PISO1.D2
 
 	module load switch I1D
-		I1D.state = true
+		I1D.state = false
 		I1D.xpos = 252
 		I1D.ypos = 204
 
@@ -575,7 +575,7 @@ module load ttl165 PISO1
 			attach N_I1_F_PD D1F.pin I1F.B PISO1.D5
 
 	module load switch I1G
-		I1G.state = true
+		I1G.state = false
 		I1G.xpos = 72
 		I1G.ypos = 204
 
@@ -614,7 +614,7 @@ scope.ch1 = "porta4"
 scope.ch2 = "portc5"
 
 #	PISO scope
-scope.ch3 = "porta0"
+scope.ch3 = "porta1"
 scope.ch4 = "porta2"
-scope.ch5 = "portc2"
+scope.ch5 = "porta0"
 scope.ch6 = "portc0"

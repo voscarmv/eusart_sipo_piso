@@ -44,13 +44,13 @@ i = 8
 	btfss		TOPISO,i-1
 	bcf		PORTA,1
 
-	bsf		PORTA,2
-	bcf		PORTA,2
-
 	btfsc		PORTA,0
 	bsf		FRPISO,i-1
 	btfss		PORTA,0
 	bcf		FRPISO,i-1
+
+	bsf		PORTA,2
+	bcf		PORTA,2
 
 i -= 1
 	endw

@@ -16,6 +16,8 @@ libsp	code
 loopback_sipo:
 	movlw		.5		;;	<< Prompt
 	call		mv_w_tx
+	.direct		"c","Control.rx"
+	.direct		"c","Control.tx = 0x03"
 	call		mv_rx_w
 	movwf		COUNT
 	xorlw		.0
@@ -25,6 +27,8 @@ loopback_sipo:
 push:
 	movlw		.6		;;	<< Prompt
 	call		mv_w_tx
+	.direct		"c","Control.rx"
+	.direct		"c","Control.tx = 0xF8"
 	call		mv_rx_w
 	call		push_w_sipo
 	call		pop_sipo_w

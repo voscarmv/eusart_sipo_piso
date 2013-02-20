@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-18-2013  16:57:32          PAGE  1
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -29,29 +29,33 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0000 00020 loopback_piso:
 0000 3003      00021         movlw           .3              ;;      << Prompt
 0001 2000      00022         call            mv_w_tx
-0002 2000      00023         call            mv_rx_w
-0003 0080      00024         movwf           COUNT
-0004 3A00      00025         xorlw           .0
-0005 1903      00026         skpnz
-0006 2800      00027         goto            finish
-0007 2000      00028         call            clear_piso
-               00029 ;;      The following instruction simulates the clear_piso
-               00030 ;;      function for the ttl165 model of gpsim, but must
-               00031 ;;      be removed upon test completion:
-0008 2000      00032         call            load_piso
-0009 00033 push:
-0009 3004      00034         movlw           .4              ;;      << Prompt
-000A 2000      00035         call            mv_w_tx
-000B 2000      00036         call            mv_rx_w
-000C 2000      00037         call            push_w_piso
-000D 2000      00038         call            pop_piso_w
-000E 2000      00039         call            mv_w_tx
-000F 0000 0000 00040         banksel         COUNT
-0011 0B80      00041         decfsz          COUNT,1
-0012 2800      00042         goto            push
-0013 00043 finish:
-0013 0008      00044         return
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-18-2013  16:57:32          PAGE  2
+               00023         .direct         "c","Control.rx"
+               00024         .direct         "c","Control.tx = 0x03"
+0002 2000      00025         call            mv_rx_w
+0003 0080      00026         movwf           COUNT
+0004 3A00      00027         xorlw           .0
+0005 1903      00028         skpnz
+0006 2800      00029         goto            finish
+0007 2000      00030         call            clear_piso
+               00031 ;;      The following instruction simulates the clear_piso
+               00032 ;;      function for the ttl165 model of gpsim, but must
+               00033 ;;      be removed upon test completion:
+0008 2000      00034         call            load_piso
+0009 00035 push:
+0009 3004      00036         movlw           .4              ;;      << Prompt
+000A 2000      00037         call            mv_w_tx
+               00038         .direct         "c","Control.rx"
+               00039         .direct         "c","Control.tx = 0xF7"
+000B 2000      00040         call            mv_rx_w
+000C 2000      00041         call            push_w_piso
+000D 2000      00042         call            pop_piso_w
+000E 2000      00043         call            mv_w_tx
+000F 0000 0000 00044         banksel         COUNT
+0011 0B80      00045         decfsz          COUNT,1
+0012 2800      00046         goto            push
+0013 00047 finish:
+0013 0008      00048         return
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  2
 
 
 SYMBOL TABLE
@@ -110,7 +114,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-18-2013  16:57:32          PAGE  3
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -170,7 +174,7 @@ ECCPASE                           00000007
 EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-18-2013  16:57:32          PAGE  4
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -230,7 +234,7 @@ NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-18-2013  16:57:32          PAGE  5
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -290,7 +294,7 @@ RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-18-2013  16:57:32          PAGE  6
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -350,7 +354,7 @@ T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-18-2013  16:57:32          PAGE  7
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -410,7 +414,7 @@ TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-18-2013  16:57:32          PAGE  8
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -470,7 +474,7 @@ _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-18-2013  16:57:32          PAGE  9
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT

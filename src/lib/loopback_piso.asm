@@ -20,6 +20,8 @@ libsp	code
 loopback_piso:
 	movlw		.3		;;	<< Prompt
 	call		mv_w_tx
+	.direct		"c","Control.rx"
+	.direct		"c","Control.tx = 0x03"
 	call		mv_rx_w
 	movwf		COUNT
 	xorlw		.0
@@ -33,6 +35,8 @@ loopback_piso:
 push:
 	movlw		.4		;;	<< Prompt
 	call		mv_w_tx
+	.direct		"c","Control.rx"
+	.direct		"c","Control.tx = 0xF7"
 	call		mv_rx_w
 	call		push_w_piso
 	call		pop_piso_w

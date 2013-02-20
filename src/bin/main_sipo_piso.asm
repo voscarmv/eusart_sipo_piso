@@ -9,6 +9,8 @@
 	extern		mv_w_tx
 	extern		sipo
 	extern		piso
+	extern		loopback_sipo
+	extern		loopback_piso
 
 start	code		H'0000'
 	call		set_ports
@@ -16,8 +18,8 @@ start	code		H'0000'
 
 prog	code
 main:
-	call		sipo
-	call		piso
+	call		loopback_sipo
+	call		loopback_piso
 aa:
 	goto		aa
 	end
