@@ -19,18 +19,18 @@ mv_piso_w:
 	bcf		PORTA,0		;;	<< data through DIPISO with CKPISO
 	bcf		PORTA,2		;;	<<
 
-i=0					;;	<< Begin synchronous reception loop
-	while		i < 8		;;	<< of 8 bits.
+i=8					;;	<< Begin synchronous reception loop
+	while		i > 0		;;	<< of 8 bits.
 
 	btfsc		PORTA,0		;;	<< If DIPISO is 0, clear bit i from
-	bsf		FRMPISO,i	;;	<< FRMPISO. Else, set bit i.
+	bsf		FRMPISO,i-1	;;	<< FRMPISO. Else, set bit i.
 	btfss		PORTA,0		;;	<<
-	bcf		FRMPISO,i	;;	<<
+	bcf		FRMPISO,i-1	;;	<<
 
 	bsf		PORTA,2		;;	<< Pop next bit from PISO into DIPISO
 	bcf		PORTA,2		;;	<< with a pulse on CKPISO
 
-i += 1					;;	<< End synchronous reception loop
+i -= 1					;;	<< End synchronous reception loop
 	endw				;;	<<
 
 	movfw		FRMPISO		;;	<< Move stored PISO byte from FMPISO

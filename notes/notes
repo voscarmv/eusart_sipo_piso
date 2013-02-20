@@ -583,3 +583,9 @@ An finally, the proper equivalencies for the 74595:
 	.RCK	I		RCK	12	I	LD high pulse
 	.MR	I		~SRCLR	10	I	CLR low pulse
 
+Sun Feb 17 02:01:23 CST 2013
+Right now, piso.asm and sipo.asm do not behave as they should. Remember to
+	goto		sipo
+and
+	goto		piso
+after finishing loops, to check for 0x00 loop-breaking signal from Control.

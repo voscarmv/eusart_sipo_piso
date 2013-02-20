@@ -14,7 +14,7 @@ COUNT	res		1
 
 libsp	code
 piso:
-	movlw		.2
+	movlw		.2		;;	<< Prompt
 	call		mv_w_tx
 	.direct		"c","Control.tx = 0x02"
 	call		mv_rx_w
@@ -30,6 +30,7 @@ ser_in:
 	decfsz		COUNT,1
 	.direct		"c","Control.rx"
 	goto		ser_in
+;;	goto		piso
 finish:
 	return
 	end

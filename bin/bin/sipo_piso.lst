@@ -1,6 +1,6 @@
 gplink-0.13.7 beta
 Copyright (c) 1998-2005 gputils project
-Listing File Generated: 2-17-2013  00:52:19
+Listing File Generated: 2-18-2013  22:12:47
  
  
 Address  Value    Disassembly              Source
@@ -90,7 +90,7 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            sipo:
-000002   3000     movlw	0                  	movlw		.0
+000002   3000     movlw	0                  	movlw		.0		;;	<< Prompt
                                            	.direct		"c", "Control.rx"
 000003   20a7     call	0xa7                	call		mv_w_tx
                                            	.direct		"c", "Control.tx = 0x02"
@@ -101,7 +101,7 @@ Address  Value    Disassembly              Source
 000008   2811     goto	0x11                	goto		finish
 000009   20b6     call	0xb6                	call		clear_sipo
                                            ser_out:
-00000a   3001     movlw	0x1                	movlw		.1
+00000a   3001     movlw	0x1                	movlw		.1		;;	<< Prompt
                                            	.direct		"c", "Control.rx"
 00000b   20a7     call	0xa7                	call		mv_w_tx
                                            	.direct		"c", "Control.tx = 0xF0"
@@ -110,6 +110,7 @@ Address  Value    Disassembly              Source
 00000e   0ba0     decfsz	0x20, f           	decfsz		COUNT,1
 00000f   280a     goto	0xa                 	goto		ser_out
 000010   20e4     call	0xe4                	call		load_sipo
+                                           ;;	call		sipo
                                            finish:
 000011   0008     return                   	return
                                            	end
@@ -203,7 +204,7 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            piso:
-00002c   3002     movlw	0x2                	movlw		.2
+00002c   3002     movlw	0x2                	movlw		.2		;;	<< Prompt
 00002d   20a7     call	0xa7                	call		mv_w_tx
                                            	.direct		"c","Control.tx = 0x02"
 00002e   2024     call	0x24                	call		mv_rx_w
@@ -220,6 +221,7 @@ Address  Value    Disassembly              Source
 000038   0ba1     decfsz	0x21, f           	decfsz		COUNT,1
                                            	.direct		"c","Control.rx"
 000039   2834     goto	0x34                	goto		ser_in
+                                           ;;	goto		piso
                                            finish:
 00003a   0008     return                   	return
                                            	end
@@ -293,18 +295,18 @@ Address  Value    Disassembly              Source
 000073   1005     bcf	0x5, 0               	bcf		PORTA,0		;;	<< data through DIPISO with CKPISO
 000074   1105     bcf	0x5, 0x2             	bcf		PORTA,2		;;	<<
                                            
-                                           i=0					;;	<< Begin synchronous reception loop
-                                           	while		i < 8		;;	<< of 8 bits.
+                                           i=8					;;	<< Begin synchronous reception loop
+                                           	while		i > 0		;;	<< of 8 bits.
                                            
 000075   1805     btfsc	0x5, 0             	btfsc		PORTA,0		;;	<< If DIPISO is 0, clear bit i from
-000076   1423     bsf	0x23, 0              	bsf		FRMPISO,i	;;	<< FRMPISO. Else, set bit i.
+000076   17a3     bsf	0x23, 0x7            	bsf		FRMPISO,i-1	;;	<< FRMPISO. Else, set bit i.
 000077   1c05     btfss	0x5, 0             	btfss		PORTA,0		;;	<<
-000078   1023     bcf	0x23, 0              	bcf		FRMPISO,i	;;	<<
+000078   13a3     bcf	0x23, 0x7            	bcf		FRMPISO,i-1	;;	<<
                                            
 000079   1505     bsf	0x5, 0x2             	bsf		PORTA,2		;;	<< Pop next bit from PISO into DIPISO
 00007a   1105     bcf	0x5, 0x2             	bcf		PORTA,2		;;	<< with a pulse on CKPISO
                                            
-                                           i += 1					;;	<< End synchronous reception loop
+                                           i -= 1					;;	<< End synchronous reception loop
                                            	endw				;;	<<
                                            
 0000a5   0823     movf	0x23, w             	movfw		FRMPISO		;;	<< Move stored PISO byte from FMPISO

@@ -1,48 +1,28 @@
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  1
+gpasm-0.13.7 beta               ./src/lib/pop_piso_w.asm2-18-2013  16:57:33          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
-               00001         processor       pic16f690
-               00002         include         <p16f690.inc>
+               00001 ;;      push_w_piso stores the byte popped from the other side of the
+               00002 ;;      daisychain into a register. Well, pop_piso_w stores that value
+               00003 ;;      in WREG.
+               00004         processor       pic16f690
+               00005         include         <p16f690.inc>
                00001         LIST
                00002 ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
                00607         LIST
-               00003 
-               00004         extern          mv_w_tx
-               00005         extern          mv_rx_w
-               00006         extern          mv_piso_w
-               00007         extern          load_piso
-               00008         extern          clear_piso
-               00009 
-               00010         global          piso
-               00011 
-               00012         udata
-               00013 COUNT   res             1
-               00014 
-               00015 libsp   code
-0000 00016 piso:
-0000 3002      00017         movlw           .2              ;;      << Prompt
-0001 2000      00018         call            mv_w_tx
-               00019         .direct         "c","Control.tx = 0x02"
-0002 2000      00020         call            mv_rx_w
-0003 0080      00021         movwf           COUNT
-0004 3A00      00022         xorlw           .0
-0005 1903      00023         skpnz
-0006 2800      00024         goto            finish
-0007 2000      00025         call            load_piso
-0008 00026 ser_in:
-0008 2000      00027         call            mv_piso_w
-0009 2000      00028         call            mv_w_tx
-000A 0000 0000 00029         banksel         COUNT
-000C 0B80      00030         decfsz          COUNT,1
-               00031         .direct         "c","Control.rx"
-000D 2800      00032         goto            ser_in
-               00033 ;;      goto            piso
-000E 00034 finish:
-000E 0008      00035         return
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  2
+               00006 
+               00007         global          pop_piso_w
+               00008 
+               00009         extern          FRPISO
+               00010 
+               00011 libsp   code
+0000 00012 pop_piso_w:
+0000 0000 0000 00013         banksel         FRPISO
+0002 0800      00014         movfw           FRPISO
+0003 0008      00015         return
+gpasm-0.13.7 beta               ./src/lib/pop_piso_w.asm2-18-2013  16:57:33          PAGE  2
 
 
 SYMBOL TABLE
@@ -101,7 +81,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  3
+gpasm-0.13.7 beta               ./src/lib/pop_piso_w.asm2-18-2013  16:57:33          PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -144,7 +124,6 @@ CKP                               00000004
 CM1CON0                           00000119
 CM2CON0                           0000011A
 CM2CON1                           0000011B
-COUNT                             00000000
 CREN                              00000004
 CSRC                              00000007
 D                                 00000005
@@ -161,13 +140,13 @@ ECCPASE                           00000007
 EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  4
+EECON2                            0000018D
+gpasm-0.13.7 beta               ./src/lib/pop_piso_w.asm2-18-2013  16:57:33          PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
-EECON2                            0000018D
 EEDAT                             0000010C
 EEDATA                            0000010C
 EEDATH                            0000010E
@@ -176,6 +155,7 @@ EEIF                              00000004
 EEPGD                             00000007
 F                                 00000001
 FERR                              00000002
+FRPISO                            00000000
 FSR                               00000004
 GIE                               00000007
 GO                                00000001
@@ -221,7 +201,7 @@ NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  5
+gpasm-0.13.7 beta               ./src/lib/pop_piso_w.asm2-18-2013  16:57:33          PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -281,7 +261,7 @@ RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  6
+gpasm-0.13.7 beta               ./src/lib/pop_piso_w.asm2-18-2013  16:57:33          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -341,7 +321,7 @@ T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  7
+gpasm-0.13.7 beta               ./src/lib/pop_piso_w.asm2-18-2013  16:57:33          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -401,7 +381,7 @@ TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  8
+gpasm-0.13.7 beta               ./src/lib/pop_piso_w.asm2-18-2013  16:57:33          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -461,7 +441,7 @@ _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  9
+gpasm-0.13.7 beta               ./src/lib/pop_piso_w.asm2-18-2013  16:57:33          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -481,14 +461,7 @@ _WDT_OFF                          00003FF7
 _WDT_ON                           00003FFF
 _XT_OSC                           00003FF9
 __16F690                          00000001
-clear_piso                        00000000
-finish                            0000000E
-load_piso                         00000000
-mv_piso_w                         00000000
-mv_rx_w                           00000000
-mv_w_tx                           00000000
-piso                              00000000
-ser_in                            00000008
+pop_piso_w                        00000000
 
 
 Errors   :       0

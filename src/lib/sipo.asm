@@ -14,7 +14,7 @@ COUNT	res		1
 
 libsp	code
 sipo:
-	movlw		.0
+	movlw		.0		;;	<< Prompt
 	.direct		"c", "Control.rx"
 	call		mv_w_tx
 	.direct		"c", "Control.tx = 0x02"
@@ -25,7 +25,7 @@ sipo:
 	goto		finish
 	call		clear_sipo
 ser_out:
-	movlw		.1
+	movlw		.1		;;	<< Prompt
 	.direct		"c", "Control.rx"
 	call		mv_w_tx
 	.direct		"c", "Control.tx = 0xF0"
@@ -34,6 +34,7 @@ ser_out:
 	decfsz		COUNT,1
 	goto		ser_out
 	call		load_sipo
+;;	call		sipo
 finish:
 	return
 	end

@@ -1,48 +1,209 @@
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  1
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
-               00001         processor       pic16f690
-               00002         include         <p16f690.inc>
+               00001 ;;      Push a byte into PISO daisychain, bit by bit. At the same time,
+               00002 ;;      with each pushed bit, record the popped bit on the other side of
+               00003 ;;      the daisychain, into a 1 byte register, until this register is
+               00004 ;;      filled.
+               00005         processor       pic16f690
+               00006         include         <p16f690.inc>
                00001         LIST
                00002 ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
                00607         LIST
-               00003 
-               00004         extern          mv_w_tx
-               00005         extern          mv_rx_w
-               00006         extern          mv_piso_w
-               00007         extern          load_piso
-               00008         extern          clear_piso
+               00007 
+               00008         variable        i
                00009 
-               00010         global          piso
-               00011 
-               00012         udata
-               00013 COUNT   res             1
-               00014 
-               00015 libsp   code
-0000 00016 piso:
-0000 3002      00017         movlw           .2              ;;      << Prompt
-0001 2000      00018         call            mv_w_tx
-               00019         .direct         "c","Control.tx = 0x02"
-0002 2000      00020         call            mv_rx_w
-0003 0080      00021         movwf           COUNT
-0004 3A00      00022         xorlw           .0
-0005 1903      00023         skpnz
-0006 2800      00024         goto            finish
-0007 2000      00025         call            load_piso
-0008 00026 ser_in:
-0008 2000      00027         call            mv_piso_w
-0009 2000      00028         call            mv_w_tx
-000A 0000 0000 00029         banksel         COUNT
-000C 0B80      00030         decfsz          COUNT,1
-               00031         .direct         "c","Control.rx"
-000D 2800      00032         goto            ser_in
-               00033 ;;      goto            piso
-000E 00034 finish:
-000E 0008      00035         return
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  2
+               00010         global          push_w_piso
+               00011         global          FRPISO
+               00012 
+               00013         udata
+               00014 TOPISO  res             1
+               00015 FRPISO  res             1
+               00016 
+               00017 libsp   code
+0000 00018 push_w_piso:
+               00019 ;;      This is pretty much the same as mv_w_sipo, except that with an
+               00020 ;;      interwined read function to record one bit at a time from the
+               00021 ;;      serial input terminal.
+               00022 
+               00023 ;;      Transmit the contents of WREG through DOPISO synchronously with CKPISO,
+               00024 ;;      storin theg the byte received through DIPISO in FRPISO global register.
+               00025 
+               00026 ;;      PORT    PIN     I/O     NAME    FUNCTION
+               00027 ;;      RA1     18      O       DOPISO  Ser data out
+               00028 ;;      RA2     17      O       CKPISO  Clock out
+               00029 ;;      RA0     19      I       DIPISO  Ser data in
+               00030 
+0000 1283 1303 00031         banksel         PORTA
+0002 1085      00032         bcf             PORTA,1
+0003 1105      00033         bcf             PORTA,2
+0004 1005      00034         bcf             PORTA,0
+               00035 
+0005 0080      00036         movwf           TOPISO
+0006 0180      00037         clrf            FRPISO
+               00038 
+  00000008     00039 i = 8
+               00040         while           i > 0
+               00041 
+               00042         btfsc           TOPISO,i-1
+               00043         bsf             PORTA,1
+               00044         btfss           TOPISO,i-1
+               00045         bcf             PORTA,1
+               00046 
+               00047         bsf             PORTA,2
+               00048         bcf             PORTA,2
+               00049 
+               00050         btfsc           PORTA,0
+               00051         bsf             FRPISO,i-1
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00052         btfss           PORTA,0
+               00053         bcf             FRPISO,i-1
+               00054 
+               00055 i -= 1
+               00056         endw
+               00041 
+0007 1B80      00042         btfsc           TOPISO,i-1
+0008 1485      00043         bsf             PORTA,1
+0009 1F80      00044         btfss           TOPISO,i-1
+000A 1085      00045         bcf             PORTA,1
+               00046 
+000B 1505      00047         bsf             PORTA,2
+000C 1105      00048         bcf             PORTA,2
+               00049 
+000D 1805      00050         btfsc           PORTA,0
+000E 1780      00051         bsf             FRPISO,i-1
+000F 1C05      00052         btfss           PORTA,0
+0010 1380      00053         bcf             FRPISO,i-1
+               00054 
+  00000007     00055 i -= 1
+               00041 
+0011 1B00      00042         btfsc           TOPISO,i-1
+0012 1485      00043         bsf             PORTA,1
+0013 1F00      00044         btfss           TOPISO,i-1
+0014 1085      00045         bcf             PORTA,1
+               00046 
+0015 1505      00047         bsf             PORTA,2
+0016 1105      00048         bcf             PORTA,2
+               00049 
+0017 1805      00050         btfsc           PORTA,0
+0018 1700      00051         bsf             FRPISO,i-1
+0019 1C05      00052         btfss           PORTA,0
+001A 1300      00053         bcf             FRPISO,i-1
+               00054 
+  00000006     00055 i -= 1
+               00041 
+001B 1A80      00042         btfsc           TOPISO,i-1
+001C 1485      00043         bsf             PORTA,1
+001D 1E80      00044         btfss           TOPISO,i-1
+001E 1085      00045         bcf             PORTA,1
+               00046 
+001F 1505      00047         bsf             PORTA,2
+0020 1105      00048         bcf             PORTA,2
+               00049 
+0021 1805      00050         btfsc           PORTA,0
+0022 1680      00051         bsf             FRPISO,i-1
+0023 1C05      00052         btfss           PORTA,0
+0024 1280      00053         bcf             FRPISO,i-1
+               00054 
+  00000005     00055 i -= 1
+               00041 
+0025 1A00      00042         btfsc           TOPISO,i-1
+0026 1485      00043         bsf             PORTA,1
+0027 1E00      00044         btfss           TOPISO,i-1
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+0028 1085      00045         bcf             PORTA,1
+               00046 
+0029 1505      00047         bsf             PORTA,2
+002A 1105      00048         bcf             PORTA,2
+               00049 
+002B 1805      00050         btfsc           PORTA,0
+002C 1600      00051         bsf             FRPISO,i-1
+002D 1C05      00052         btfss           PORTA,0
+002E 1200      00053         bcf             FRPISO,i-1
+               00054 
+  00000004     00055 i -= 1
+               00041 
+002F 1980      00042         btfsc           TOPISO,i-1
+0030 1485      00043         bsf             PORTA,1
+0031 1D80      00044         btfss           TOPISO,i-1
+0032 1085      00045         bcf             PORTA,1
+               00046 
+0033 1505      00047         bsf             PORTA,2
+0034 1105      00048         bcf             PORTA,2
+               00049 
+0035 1805      00050         btfsc           PORTA,0
+0036 1580      00051         bsf             FRPISO,i-1
+0037 1C05      00052         btfss           PORTA,0
+0038 1180      00053         bcf             FRPISO,i-1
+               00054 
+  00000003     00055 i -= 1
+               00041 
+0039 1900      00042         btfsc           TOPISO,i-1
+003A 1485      00043         bsf             PORTA,1
+003B 1D00      00044         btfss           TOPISO,i-1
+003C 1085      00045         bcf             PORTA,1
+               00046 
+003D 1505      00047         bsf             PORTA,2
+003E 1105      00048         bcf             PORTA,2
+               00049 
+003F 1805      00050         btfsc           PORTA,0
+0040 1500      00051         bsf             FRPISO,i-1
+0041 1C05      00052         btfss           PORTA,0
+0042 1100      00053         bcf             FRPISO,i-1
+               00054 
+  00000002     00055 i -= 1
+               00041 
+0043 1880      00042         btfsc           TOPISO,i-1
+0044 1485      00043         bsf             PORTA,1
+0045 1C80      00044         btfss           TOPISO,i-1
+0046 1085      00045         bcf             PORTA,1
+               00046 
+0047 1505      00047         bsf             PORTA,2
+0048 1105      00048         bcf             PORTA,2
+               00049 
+0049 1805      00050         btfsc           PORTA,0
+004A 1480      00051         bsf             FRPISO,i-1
+004B 1C05      00052         btfss           PORTA,0
+004C 1080      00053         bcf             FRPISO,i-1
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00054 
+  00000001     00055 i -= 1
+               00041 
+004D 1800      00042         btfsc           TOPISO,i-1
+004E 1485      00043         bsf             PORTA,1
+004F 1C00      00044         btfss           TOPISO,i-1
+0050 1085      00045         bcf             PORTA,1
+               00046 
+0051 1505      00047         bsf             PORTA,2
+0052 1105      00048         bcf             PORTA,2
+               00049 
+0053 1805      00050         btfsc           PORTA,0
+0054 1400      00051         bsf             FRPISO,i-1
+0055 1C05      00052         btfss           PORTA,0
+0056 1000      00053         bcf             FRPISO,i-1
+               00054 
+  00000000     00055 i -= 1
+               00057 
+0057 0008      00058         return
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE  5
 
 
 SYMBOL TABLE
@@ -101,7 +262,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  3
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -144,7 +305,6 @@ CKP                               00000004
 CM1CON0                           00000119
 CM2CON0                           0000011A
 CM2CON1                           0000011B
-COUNT                             00000000
 CREN                              00000004
 CSRC                              00000007
 D                                 00000005
@@ -161,13 +321,13 @@ ECCPASE                           00000007
 EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  4
+EECON2                            0000018D
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
-EECON2                            0000018D
 EEDAT                             0000010C
 EEDATA                            0000010C
 EEDATH                            0000010E
@@ -176,6 +336,7 @@ EEIF                              00000004
 EEPGD                             00000007
 F                                 00000001
 FERR                              00000002
+FRPISO                            00000001
 FSR                               00000004
 GIE                               00000007
 GO                                00000001
@@ -221,7 +382,7 @@ NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  5
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -281,7 +442,7 @@ RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  6
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -341,7 +502,7 @@ T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  7
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -366,6 +527,7 @@ TMR2                              00000011
 TMR2IE                            00000001
 TMR2IF                            00000001
 TMR2ON                            00000002
+TOPISO                            00000000
 TOUTPS0                           00000003
 TOUTPS1                           00000004
 TOUTPS2                           00000005
@@ -400,13 +562,13 @@ TUN4                              00000004
 TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
-TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  8
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+TXIE                              00000004
 TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
@@ -460,13 +622,13 @@ _EXTRC_OSC_NOCLKOUT               00003FFE
 _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
-_IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-18-2013  16:57:28          PAGE  9
+gpasm-0.13.7 beta               ./src/lib/push_w_piso.asm2-18-2013  16:57:32          PAGE 12
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+_IESO_OFF                         00003BFF
 _IESO_ON                          00003FFF
 _INTOSC                           00003FFD
 _INTOSCIO                         00003FFC
@@ -481,14 +643,8 @@ _WDT_OFF                          00003FF7
 _WDT_ON                           00003FFF
 _XT_OSC                           00003FF9
 __16F690                          00000001
-clear_piso                        00000000
-finish                            0000000E
-load_piso                         00000000
-mv_piso_w                         00000000
-mv_rx_w                           00000000
-mv_w_tx                           00000000
-piso                              00000000
-ser_in                            00000008
+i                                 00000000
+push_w_piso                       00000000
 
 
 Errors   :       0

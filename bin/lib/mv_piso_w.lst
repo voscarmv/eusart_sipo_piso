@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE  1
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -28,37 +28,37 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0002 1005      00019         bcf             PORTA,0         ;;      << data through DIPISO with CKPISO
 0003 1105      00020         bcf             PORTA,2         ;;      <<
                00021 
-  00000000     00022 i=0                                     ;;      << Begin synchronous reception loop
-               00023         while           i < 8           ;;      << of 8 bits.
+  00000008     00022 i=8                                     ;;      << Begin synchronous reception loop
+               00023         while           i > 0           ;;      << of 8 bits.
                00024 
                00025         btfsc           PORTA,0         ;;      << If DIPISO is 0, clear bit i from
-               00026         bsf             FRMPISO,i       ;;      << FRMPISO. Else, set bit i.
+               00026         bsf             FRMPISO,i-1     ;;      << FRMPISO. Else, set bit i.
                00027         btfss           PORTA,0         ;;      <<
-               00028         bcf             FRMPISO,i       ;;      <<
+               00028         bcf             FRMPISO,i-1     ;;      <<
                00029 
                00030         bsf             PORTA,2         ;;      << Pop next bit from PISO into DIPISO
                00031         bcf             PORTA,2         ;;      << with a pulse on CKPISO
                00032 
-               00033 i += 1                                  ;;      << End synchronous reception loop
+               00033 i -= 1                                  ;;      << End synchronous reception loop
                00034         endw                            ;;      <<
                00024 
 0004 1805      00025         btfsc           PORTA,0         ;;      << If DIPISO is 0, clear bit i from
-0005 1400      00026         bsf             FRMPISO,i       ;;      << FRMPISO. Else, set bit i.
+0005 1780      00026         bsf             FRMPISO,i-1     ;;      << FRMPISO. Else, set bit i.
 0006 1C05      00027         btfss           PORTA,0         ;;      <<
-0007 1000      00028         bcf             FRMPISO,i       ;;      <<
+0007 1380      00028         bcf             FRMPISO,i-1     ;;      <<
                00029 
 0008 1505      00030         bsf             PORTA,2         ;;      << Pop next bit from PISO into DIPISO
 0009 1105      00031         bcf             PORTA,2         ;;      << with a pulse on CKPISO
                00032 
-  00000001     00033 i += 1                                  ;;      << End synchronous reception loop
+  00000007     00033 i -= 1                                  ;;      << End synchronous reception loop
                00024 
 000A 1805      00025         btfsc           PORTA,0         ;;      << If DIPISO is 0, clear bit i from
-000B 1480      00026         bsf             FRMPISO,i       ;;      << FRMPISO. Else, set bit i.
+000B 1700      00026         bsf             FRMPISO,i-1     ;;      << FRMPISO. Else, set bit i.
 000C 1C05      00027         btfss           PORTA,0         ;;      <<
-000D 1080      00028         bcf             FRMPISO,i       ;;      <<
+000D 1300      00028         bcf             FRMPISO,i-1     ;;      <<
                00029 
 000E 1505      00030         bsf             PORTA,2         ;;      << Pop next bit from PISO into DIPISO
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE  2
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -66,79 +66,79 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
  
 000F 1105      00031         bcf             PORTA,2         ;;      << with a pulse on CKPISO
                00032 
-  00000002     00033 i += 1                                  ;;      << End synchronous reception loop
+  00000006     00033 i -= 1                                  ;;      << End synchronous reception loop
                00024 
 0010 1805      00025         btfsc           PORTA,0         ;;      << If DIPISO is 0, clear bit i from
-0011 1500      00026         bsf             FRMPISO,i       ;;      << FRMPISO. Else, set bit i.
+0011 1680      00026         bsf             FRMPISO,i-1     ;;      << FRMPISO. Else, set bit i.
 0012 1C05      00027         btfss           PORTA,0         ;;      <<
-0013 1100      00028         bcf             FRMPISO,i       ;;      <<
+0013 1280      00028         bcf             FRMPISO,i-1     ;;      <<
                00029 
 0014 1505      00030         bsf             PORTA,2         ;;      << Pop next bit from PISO into DIPISO
 0015 1105      00031         bcf             PORTA,2         ;;      << with a pulse on CKPISO
                00032 
-  00000003     00033 i += 1                                  ;;      << End synchronous reception loop
+  00000005     00033 i -= 1                                  ;;      << End synchronous reception loop
                00024 
 0016 1805      00025         btfsc           PORTA,0         ;;      << If DIPISO is 0, clear bit i from
-0017 1580      00026         bsf             FRMPISO,i       ;;      << FRMPISO. Else, set bit i.
+0017 1600      00026         bsf             FRMPISO,i-1     ;;      << FRMPISO. Else, set bit i.
 0018 1C05      00027         btfss           PORTA,0         ;;      <<
-0019 1180      00028         bcf             FRMPISO,i       ;;      <<
+0019 1200      00028         bcf             FRMPISO,i-1     ;;      <<
                00029 
 001A 1505      00030         bsf             PORTA,2         ;;      << Pop next bit from PISO into DIPISO
 001B 1105      00031         bcf             PORTA,2         ;;      << with a pulse on CKPISO
                00032 
-  00000004     00033 i += 1                                  ;;      << End synchronous reception loop
+  00000004     00033 i -= 1                                  ;;      << End synchronous reception loop
                00024 
 001C 1805      00025         btfsc           PORTA,0         ;;      << If DIPISO is 0, clear bit i from
-001D 1600      00026         bsf             FRMPISO,i       ;;      << FRMPISO. Else, set bit i.
+001D 1580      00026         bsf             FRMPISO,i-1     ;;      << FRMPISO. Else, set bit i.
 001E 1C05      00027         btfss           PORTA,0         ;;      <<
-001F 1200      00028         bcf             FRMPISO,i       ;;      <<
+001F 1180      00028         bcf             FRMPISO,i-1     ;;      <<
                00029 
 0020 1505      00030         bsf             PORTA,2         ;;      << Pop next bit from PISO into DIPISO
 0021 1105      00031         bcf             PORTA,2         ;;      << with a pulse on CKPISO
                00032 
-  00000005     00033 i += 1                                  ;;      << End synchronous reception loop
+  00000003     00033 i -= 1                                  ;;      << End synchronous reception loop
                00024 
 0022 1805      00025         btfsc           PORTA,0         ;;      << If DIPISO is 0, clear bit i from
-0023 1680      00026         bsf             FRMPISO,i       ;;      << FRMPISO. Else, set bit i.
+0023 1500      00026         bsf             FRMPISO,i-1     ;;      << FRMPISO. Else, set bit i.
 0024 1C05      00027         btfss           PORTA,0         ;;      <<
-0025 1280      00028         bcf             FRMPISO,i       ;;      <<
+0025 1100      00028         bcf             FRMPISO,i-1     ;;      <<
                00029 
 0026 1505      00030         bsf             PORTA,2         ;;      << Pop next bit from PISO into DIPISO
 0027 1105      00031         bcf             PORTA,2         ;;      << with a pulse on CKPISO
                00032 
-  00000006     00033 i += 1                                  ;;      << End synchronous reception loop
+  00000002     00033 i -= 1                                  ;;      << End synchronous reception loop
                00024 
 0028 1805      00025         btfsc           PORTA,0         ;;      << If DIPISO is 0, clear bit i from
-0029 1700      00026         bsf             FRMPISO,i       ;;      << FRMPISO. Else, set bit i.
+0029 1480      00026         bsf             FRMPISO,i-1     ;;      << FRMPISO. Else, set bit i.
 002A 1C05      00027         btfss           PORTA,0         ;;      <<
-002B 1300      00028         bcf             FRMPISO,i       ;;      <<
+002B 1080      00028         bcf             FRMPISO,i-1     ;;      <<
                00029 
 002C 1505      00030         bsf             PORTA,2         ;;      << Pop next bit from PISO into DIPISO
 002D 1105      00031         bcf             PORTA,2         ;;      << with a pulse on CKPISO
                00032 
-  00000007     00033 i += 1                                  ;;      << End synchronous reception loop
+  00000001     00033 i -= 1                                  ;;      << End synchronous reception loop
                00024 
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE  3
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
 002E 1805      00025         btfsc           PORTA,0         ;;      << If DIPISO is 0, clear bit i from
-002F 1780      00026         bsf             FRMPISO,i       ;;      << FRMPISO. Else, set bit i.
+002F 1400      00026         bsf             FRMPISO,i-1     ;;      << FRMPISO. Else, set bit i.
 0030 1C05      00027         btfss           PORTA,0         ;;      <<
-0031 1380      00028         bcf             FRMPISO,i       ;;      <<
+0031 1000      00028         bcf             FRMPISO,i-1     ;;      <<
                00029 
 0032 1505      00030         bsf             PORTA,2         ;;      << Pop next bit from PISO into DIPISO
 0033 1105      00031         bcf             PORTA,2         ;;      << with a pulse on CKPISO
                00032 
-  00000008     00033 i += 1                                  ;;      << End synchronous reception loop
+  00000000     00033 i -= 1                                  ;;      << End synchronous reception loop
                00035 
 0034 0800      00036         movfw           FRMPISO         ;;      << Move stored PISO byte from FMPISO
                00037                                         ;;         to WREG
                00038 
 0035 0008      00039         return
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE  4
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE  4
 
 
 SYMBOL TABLE
@@ -197,7 +197,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE  5
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -257,7 +257,7 @@ EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
 EECON2                            0000018D
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE  6
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -317,7 +317,7 @@ NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE  7
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -377,7 +377,7 @@ RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE  8
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -437,7 +437,7 @@ T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE  9
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -497,7 +497,7 @@ TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE 10
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -557,7 +557,7 @@ _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-9-2013  23:33:11           PAGE 11
+gpasm-0.13.7 beta               ./src/lib/mv_piso_w.asm2-18-2013  22:12:46          PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -577,7 +577,7 @@ _WDT_OFF                          00003FF7
 _WDT_ON                           00003FFF
 _XT_OSC                           00003FF9
 __16F690                          00000001
-i                                 00000008
+i                                 00000000
 mv_piso_w                         00000000
 
 

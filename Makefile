@@ -30,6 +30,12 @@ objects := \
 	${libdir}/piso.o \
 		${libdir}/mv_piso_w.o \
 		${libdir}/load_piso.o \
+	${libdir}/loopback_sipo.o \
+		${libdir}/push_w_sipo.o \
+		${libdir}/pop_sipo_w.o \
+	${libdir}/loopback_piso.o \
+		${libdir}/push_w_piso.o \
+		${libdir}/pop_piso_w.o \
 \
 		${libdir}/mv_rx_w.o \
 		${libdir}/mv_w_tx.o

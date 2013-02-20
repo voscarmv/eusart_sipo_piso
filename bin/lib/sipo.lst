@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/sipo.asm2-15-2013  19:24:47          PAGE  1
+gpasm-0.13.7 beta               ./src/lib/sipo.asm2-18-2013  16:57:27          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -23,7 +23,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                00014 
                00015 libsp   code
 0000 00016 sipo:
-0000 3000      00017         movlw           .0
+0000 3000      00017         movlw           .0              ;;      << Prompt
                00018         .direct         "c", "Control.rx"
 0001 2000      00019         call            mv_w_tx
                00020         .direct         "c", "Control.tx = 0x02"
@@ -34,7 +34,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0006 2800      00025         goto            finish
 0007 2000      00026         call            clear_sipo
 0008 00027 ser_out:
-0008 3001      00028         movlw           .1
+0008 3001      00028         movlw           .1              ;;      << Prompt
                00029         .direct         "c", "Control.rx"
 0009 2000      00030         call            mv_w_tx
                00031         .direct         "c", "Control.tx = 0xF0"
@@ -43,9 +43,10 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 000C 0B80      00034         decfsz          COUNT,1
 000D 2800      00035         goto            ser_out
 000E 2000      00036         call            load_sipo
-000F 00037 finish:
-000F 0008      00038         return
-gpasm-0.13.7 beta               ./src/lib/sipo.asm2-15-2013  19:24:47          PAGE  2
+               00037 ;;      call            sipo
+000F 00038 finish:
+000F 0008      00039         return
+gpasm-0.13.7 beta               ./src/lib/sipo.asm2-18-2013  16:57:27          PAGE  2
 
 
 SYMBOL TABLE
@@ -104,7 +105,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/sipo.asm2-15-2013  19:24:47          PAGE  3
+gpasm-0.13.7 beta               ./src/lib/sipo.asm2-18-2013  16:57:27          PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -164,7 +165,7 @@ ECCPASE                           00000007
 EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
-gpasm-0.13.7 beta               ./src/lib/sipo.asm2-15-2013  19:24:47          PAGE  4
+gpasm-0.13.7 beta               ./src/lib/sipo.asm2-18-2013  16:57:27          PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -224,7 +225,7 @@ NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/sipo.asm2-15-2013  19:24:47          PAGE  5
+gpasm-0.13.7 beta               ./src/lib/sipo.asm2-18-2013  16:57:27          PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -284,7 +285,7 @@ RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/sipo.asm2-15-2013  19:24:47          PAGE  6
+gpasm-0.13.7 beta               ./src/lib/sipo.asm2-18-2013  16:57:27          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -344,7 +345,7 @@ T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/sipo.asm2-15-2013  19:24:47          PAGE  7
+gpasm-0.13.7 beta               ./src/lib/sipo.asm2-18-2013  16:57:27          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -404,7 +405,7 @@ TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/sipo.asm2-15-2013  19:24:47          PAGE  8
+gpasm-0.13.7 beta               ./src/lib/sipo.asm2-18-2013  16:57:27          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -464,7 +465,7 @@ _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/sipo.asm2-15-2013  19:24:47          PAGE  9
+gpasm-0.13.7 beta               ./src/lib/sipo.asm2-18-2013  16:57:27          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT

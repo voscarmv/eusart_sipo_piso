@@ -14,12 +14,12 @@ X		load_sipo.asm
 X	piso.asm
 X		mv_piso_w.asm
 X		load_piso.asm
-	loopback_sipo.asm
-		push_w_sipo.asm
-		pop_sipo_w.asm
-	loopback_piso.asm
-		push_w_piso.asm
-		pop_piso_w.asm
+X	loopback_sipo.asm
+X		push_w_sipo.asm
+X		pop_sipo_w.asm
+X	loopback_piso.asm
+X		push_w_piso.asm
+X		pop_piso_w.asm
 #	sipo.asm & piso.asm & loopback_sipo.asm & loopback_piso.asm
 X		mv_w_tx.asm
 X		mv_rx_w.asm

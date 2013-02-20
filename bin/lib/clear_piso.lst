@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-9-2013  23:33:03           PAGE  1
+gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-18-2013  16:57:24          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -19,7 +19,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0003 1087      00010         bcf             PORTC,1
 0004 1487      00011         bsf             PORTC,1
 0005 0008      00012         return
-gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-9-2013  23:33:03           PAGE  2
+gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-18-2013  16:57:24          PAGE  2
 
 
 SYMBOL TABLE
@@ -78,7 +78,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-9-2013  23:33:03           PAGE  3
+gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-18-2013  16:57:24          PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -138,7 +138,7 @@ EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
 EECON2                            0000018D
-gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-9-2013  23:33:03           PAGE  4
+gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-18-2013  16:57:24          PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -198,7 +198,7 @@ NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
 NOT_PD                            00000003
-gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-9-2013  23:33:03           PAGE  5
+gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-18-2013  16:57:24          PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -258,7 +258,7 @@ RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
 RCIF                              00000005
-gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-9-2013  23:33:03           PAGE  6
+gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-18-2013  16:57:24          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -318,7 +318,7 @@ T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
 T1IF                              00000000
-gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-9-2013  23:33:03           PAGE  7
+gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-18-2013  16:57:24          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -378,7 +378,7 @@ TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
 TXIF                              00000004
-gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-9-2013  23:33:03           PAGE  8
+gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-18-2013  16:57:24          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -438,7 +438,7 @@ _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
 _IESO_ON                          00003FFF
-gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-9-2013  23:33:03           PAGE  9
+gpasm-0.13.7 beta               ./src/lib/clear_piso.asm2-18-2013  16:57:24          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT

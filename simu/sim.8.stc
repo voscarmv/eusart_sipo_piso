@@ -1,0 +1,620 @@
+#This is a list of how the ICs 74595 and 74596 are connected to the PIC to provide SIPO and
+#PISO data propagation.
+#All information is taken from the 74LS595 and 74LS597 Texas Instruments datasheets.
+#
+#------------------------------------------------------------------------------------
+#IC 74595 SIPO				| PIC16F690
+#PORT	PIN #	I/O	FUNC		| PORT	PIN #	I/O	NAME	FUNC
+#~SRCLR	10	I	CLR low pulse	| RC4	6	O	CRSIPO	Clear out
+#RCK	12	I	LD high pulse	| RC5	5	O	LDSIPO	Load D out
+#SER	14	I	Serial in	| RA5	2	O	DOSIPO	Ser data out
+#SRCK	11	I	Serial LH CK	| RA4	3	O	CKSIPO	Clock out
+#QH'	9	O	Serial out	| RA3	4	I	DISIPO	Ser data in
+#					|-------------------------------------------
+#					| Set to VCC or GND
+#VCC	16	I	Voltage input	| VCC
+#GND	8	I	Ground		| GND
+#~G	13	I	Out chns gauge	| GND
+#QA	15	O	A out channel	| NC
+#QB	1	O	B out channel	| NC
+#QC	2	O	C out channel	| NC
+#QD	3	O	D out channel	| NC
+#QE	4	O	E out channel	| NC
+#QF	5	O	F out channel	| NC
+#QG	6	O	G out channel	| NC
+#QH	7	O	H out channel	| NC
+#------------------------------------------------------------------------------------
+#
+#NOTE: QH' may be connected either to RA3, or to the next 74595's SER to expand SIPO.
+#
+#------------------------------------------------------------------------------------
+#IC 74597 PISO				| PIC16F690
+#PORT	PIN #	I/O	FUNC		| PORT	PIN #	I/O	NAME	FUNC
+#~SRCLR	10	I	CLR low pulse	| RC1	15	O	CRPISO	Clear out
+#RCK	12	I	LD1 high pulse	| RC0	16	O	LD1PISO	Load D1 out
+#~SRLOAD13	I	LD2 low pulse	| RC2	14	O	LD2PISO	Load D2 out
+#SER	14	I	Serial in	| RA1	18	O	DOPISO	Ser data out
+#SRCK	11	I	Serial LH CK	| RA2	17	O	CKPISO	Clock out
+#QH'	9	O	Serial out	| RA0	19	I	DIPISO	Ser data in
+#					|-------------------------------------------
+#					| Set to VCC or GND
+#VCC	16	I	Voltage input	| VCC
+#GND	8	I	Ground		| GND
+#A	15	I	A in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+#B	1	I	B in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+#C	2	I	C in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+#D	3	I	D in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+#E	4	I	E in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+#F	5	I	F in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+#G	6	I	G in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+#H	7	I	H in channel	| GND through 5K Ohm < R < 8K Ohm resistor
+#------------------------------------------------------------------------------------
+#
+#NOTE: QH' may be connected either to RA0, or to the next 74597's SER to expand PISO. Also
+#remember to first pulse LD1PISO and then LD2PISO to load byte data into PISO registers.
+#
+#Now, some equivalencies between the actual Texas Instruments ICs, and the gpsim modules:
+#
+#	TTL165 gpsim module	IC 74597 PISO
+#	PIN	I/O		PORT	PIN #	I/O	FUNC
+#	.D0	I		A	15	I	A in channel
+#	.D1	I		B	1	I	B in channel
+#	.D2	I		C	2	I	C in channel
+#	.D3	I		D	3	I	D in channel	
+#	.D4	I		E	4	I	E in channel	
+#	.D5	I		F	5	I	F in channel	
+#	.D6	I		G	6	I	G in channel	
+#	.D7	I		H	7	I	H in channel	
+#	.Ds	I		SER	14	I	Serial in
+#	.Q7	O		QH'	9	O	Serial out
+#	.nQ7	O		-	-	O	NOT Ser out
+#	.CE	I		-	-	I	Clock enable (H)
+#	.CP	I		SRCK	11	I	Serial LH CK
+#	.PL	I		~SRLOAD	13	I	LD2 low pulse
+#
+#NOTE: The TTL165 model is only roughly equivalent to the 74597 IC.
+#One difference between the 74165 and the 74597 is the fact that the 74597
+#has a Master Clear terminal, whereas the 74165 does not.
+#This is the most relevant difference between the two, since the MCLR is used
+#by the loopback_piso function to verify the number of daisychained 74597s.
+#
+#The 74165 IC would be the correct equivalent.
+#This is the proper equivalency between the TTL165 model and the actual 74165
+#TI IC:
+#
+#	TTL165 gpsim module	IC 74165 PISO
+#	PIN	I/O		PORT	PIN #	I/O	FUNC
+#	.D0	I		A	11	I	A in channel
+#	.D1	I		B	12	I	B in channel
+#	.D2	I		C	13	I	C in channel
+#	.D3	I		D	14	I	D in channel
+#	.D4	I		E	3	I	E in channel
+#	.D5	I		F	4	I	F in channel
+#	.D6	I		G	5	I	G in channel
+#	.D7	I		H	6	I	H in channel
+#	.Ds	I		SER	10	I	Serial in
+#	.Q7	O		QH	9	O	Serial out
+#	.nQ7	O		~QH	7	O	~Serial out
+#	.CE	I		CLK INH	15	I	Clock enable
+#	.CP	I		CLK	2	I	Clock LH edge
+#	.PL	I		SH/~LD	1	I	Shift/~Load
+#
+#An finally, the proper equivalencies for the 74595:
+#
+#	TTL595 gpsim module	IC 74595 SIPO
+#	PIN	I/O		PORT	PIN #	I/O	FUNC
+#	.Q0	O		QA	15	O	A out channel
+#	.Q1	O		QB	1	O	B out channel
+#	.Q2	O		QC	2	O	C out channel
+#	.Q3	O		QD	3	O	D out channel
+#	.Q4	O		QE	4	O	E out channel
+#	.Q5	O		QF	5	O	F out channel
+#	.Q6	O		QG	6	O	G out channel
+#	.Q7	O		QH	7	O	H out channel
+#	.Ds	I		SER	14	I	Serial in
+#	.Qs	O		QH'	9	O	Serial out
+#	.OE	I		~G	13	I	Out chns gauge
+#	.SCK	I		SRCK	11	I	Serial LH CK
+#	.RCK	I		RCK	12	I	LD high pulse
+#	.MR	I		~SRCLR	10	I	CLR low pulse
+#
+frequency 4000000
+
+stimulus asy
+	initial_state 1
+	start_cycle 0
+	{ 0,1 }
+	name one
+end
+
+stimulus asy
+	initial_state 0
+	start_cycle 0
+	{ 0,0 }
+	name zero
+end
+
+# processor p16f690 Interface
+	p16f690.xpos = 336
+	p16f690.ypos = 24
+
+module library /usr/local/lib/libgpsim_modules.so
+
+module load usart Control
+	Control.console = false
+	Control.txbaud = 19200
+	Control.rxbaud = 19200
+	Control.xpos = 300
+	Control.ypos = 300
+
+	node ctx_irx itx_crx
+		attach ctx_irx Control.TXPIN portb5
+		attach itx_crx portb7 Control.RXPIN
+
+module load ttl595 SIPO2
+	SIPO2.xpos = 576
+	SIPO2.ypos = 276
+
+#	It doesn't work to have two separate nodes to connect three pins, e.g.:
+#	pins A, B and C, connected through nodes 1 and 2, thus:
+#	Node 1: A, B	<< Wrong!
+#	Node 2: B, C	<<
+#	The correct way to do it, is to use only one node:
+#	Node 1: A, B, C	<< Bingo!
+#	Therefor, the following didn't work:
+#
+# 	node N_O2_SRCLR_RC4 N_O2_QH_SER N_O2_SRCK_RA4 N_O2_SER_RA5 N_O2_RCK_RC5 N_O2_G_ZERO
+# 		attach N_O2_SRCLR_RC4 SIPO2.MR portc4
+# 		attach N_O2_RCK_RC5 SIPO2.RCK portc5
+# 		attach N_O2_SRCK_RA4 SIPO2.SCK porta4
+# 		attach N_O2_QH_SER SIPO2.Qs porta3
+# 		attach N_O2_G_ZERO SIPO2.OE zero
+
+	module load led O2QA
+		O2QA.color = blue
+		O2QA.xpos = 744
+		O2QA.ypos = 432
+
+		node N_O2QA
+			attach N_O2QA O2QA.in SIPO2.Q0
+
+	module load led O2QB
+		O2QB.color = green
+		O2QB.xpos = 708
+		O2QB.ypos = 432
+
+		node N_O2QB
+			attach N_O2QB O2QB.in SIPO2.Q1
+
+	module load led O2QC
+		O2QC.color = yellow
+		O2QC.xpos = 672
+		O2QC.ypos = 432
+
+		node N_O2QC
+			attach N_O2QC O2QC.in SIPO2.Q2
+
+	module load led O2QD
+		O2QD.color = red
+		O2QD.xpos = 636
+		O2QD.ypos = 432
+
+		node N_O2QD
+			attach N_O2QD O2QD.in SIPO2.Q3
+
+	module load led O2QE
+		O2QE.color = blue
+		O2QE.xpos = 600
+		O2QE.ypos = 432
+
+		node N_O2QE
+			attach N_O2QE O2QE.in SIPO2.Q4
+
+	module load led O2QF
+		O2QF.color = green
+		O2QF.xpos = 564
+		O2QF.ypos = 432
+
+		node N_O2QF
+			attach N_O2QF O2QF.in SIPO2.Q5
+
+	module load led O2QG
+		O2QG.color = yellow
+		O2QG.xpos = 528
+		O2QG.ypos = 432
+
+		node N_O2QG
+			attach N_O2QG O2QG.in SIPO2.Q6
+
+	module load led O2QH
+		O2QH.color = red
+		O2QH.xpos = 492
+		O2QH.ypos = 432
+
+		node N_O2QH
+			attach N_O2QH O2QH.in SIPO2.Q7
+
+module load ttl595 SIPO1
+	SIPO1.xpos = 576
+	SIPO1.ypos = 60
+
+	node N_O_SRCLR_RC4 N_O_QH_SER N_O_SRCK_RA4 N_O_SER_RA5 N_O_RCK_RC5 N_O_G_ZERO
+	node N_O_QH_RA3
+		attach N_O_SRCLR_RC4 SIPO1.MR SIPO2.MR portc4
+		attach N_O_RCK_RC5 SIPO1.RCK SIPO2.RCK portc5
+		attach N_O_SER_RA5 SIPO1.Ds porta5
+		attach N_O_SRCK_RA4 SIPO1.SCK SIPO2.SCK porta4
+		attach N_O_QH_SER SIPO1.Qs SIPO2.Ds
+		attach N_O_G_ZERO SIPO1.OE SIPO2.OE zero
+		attach N_O_QH_RA3 SIPO2.Qs porta3
+
+	module load led O1QA
+		O1QA.color = blue
+		O1QA.xpos = 744
+		O1QA.ypos = 216
+
+		node N_O1QA
+			attach N_O1QA O1QA.in SIPO1.Q0
+
+	module load led O1QB
+		O1QB.color = green
+		O1QB.xpos = 708
+		O1QB.ypos = 216
+
+		node N_O1QB
+			attach N_O1QB O1QB.in SIPO1.Q1
+
+	module load led O1QC
+		O1QC.color = yellow
+		O1QC.xpos = 672
+		O1QC.ypos = 216
+
+		node N_O1QC
+			attach N_O1QC O1QC.in SIPO1.Q2
+
+	module load led O1QD
+		O1QD.color = red
+		O1QD.xpos = 636
+		O1QD.ypos = 216
+
+		node N_O1QD
+			attach N_O1QD O1QD.in SIPO1.Q3
+
+	module load led O1QE
+		O1QE.color = blue
+		O1QE.xpos = 600
+		O1QE.ypos = 216
+
+		node N_O1QE
+			attach N_O1QE O1QE.in SIPO1.Q4
+
+	module load led O1QF
+		O1QF.color = green
+		O1QF.xpos = 564
+		O1QF.ypos = 216
+
+		node N_O1QF
+			attach N_O1QF O1QF.in SIPO1.Q5
+
+	module load led O1QG
+		O1QG.color = yellow
+		O1QG.xpos = 528
+		O1QG.ypos = 216
+
+		node N_O1QG
+			attach N_O1QG O1QG.in SIPO1.Q6
+
+	module load led O1QH
+		O1QH.color = red
+		O1QH.xpos = 492
+		O1QH.ypos = 216
+
+		node N_O1QH
+			attach N_O1QH O1QH.in SIPO1.Q7
+
+module load ttl165 PISO2
+	PISO2.xpos = 72
+	PISO2.ypos = 276
+
+	module load switch I2A
+		I2A.state = false
+		I2A.xpos = 432
+		I2A.ypos = 420
+
+		module load pullup U2A
+			U2A.xpos = 636
+			U2A.ypos = 564
+
+		module load pulldown D2A
+			D2A.xpos = 720
+			D2A.ypos = 564
+
+		node N_I2_A_PU N_I2_A_PD
+			attach N_I2_A_PU U2A.pin I2A.A
+			attach N_I2_A_PD D2A.pin I2A.B PISO2.D0
+
+	module load switch I2B
+		I2B.state = false
+		I2B.xpos = 372
+		I2B.ypos = 420
+
+		module load pullup U2B
+			U2B.xpos = 48
+			U2B.ypos = 624
+
+		module load pulldown D2B
+			D2B.xpos = 132
+			D2B.ypos = 624
+
+		node N_I2_B_PU N_I2_B_PD
+			attach N_I2_B_PU U2B.pin I2B.A
+			attach N_I2_B_PD D2B.pin I2B.B PISO2.D1
+
+	module load switch I2C
+		I2C.state = false
+		I2C.xpos = 312
+		I2C.ypos = 420
+
+		module load pullup U2C
+			U2C.xpos = 216
+			U2C.ypos = 624
+
+		module load pulldown D2C
+			D2C.xpos = 300
+			D2C.ypos = 624
+
+		node N_I2_C_PU N_I2_C_PD
+			attach N_I2_C_PU U2C.pin I2C.A
+			attach N_I2_C_PD D2C.pin I2C.B PISO2.D2
+
+	module load switch I2D
+		I2D.state = false
+		I2D.xpos = 252
+		I2D.ypos = 420
+
+		module load pullup U2D
+			U2D.xpos = 384
+			U2D.ypos = 624
+
+		module load pulldown D2D
+			D2D.xpos = 468
+			D2D.ypos = 624
+
+		node N_I2_D_PU N_I2_D_PD
+			attach N_I2_D_PU U2D.pin I2D.A
+			attach N_I2_D_PD D2D.pin I2D.B PISO2.D3
+
+	module load switch I2E
+		I2E.state = false
+		I2E.xpos = 192
+		I2E.ypos = 420
+
+		module load pullup U2E
+			U2E.xpos = 552
+			U2E.ypos = 624
+
+		module load pulldown D2E
+			D2E.xpos = 636
+			D2E.ypos = 624
+
+		node N_I2_E_PU N_I2_E_PD
+			attach N_I2_E_PU U2E.pin I2E.A
+			attach N_I2_E_PD D2E.pin I2E.B PISO2.D4
+
+	module load switch I2F
+		I2F.state = false
+		I2F.xpos = 132
+		I2F.ypos = 420
+
+		module load pullup U2F
+			U2F.xpos = 720
+			U2F.ypos = 624
+
+		module load pulldown D2F
+			D2F.xpos = 48
+			D2F.ypos = 684
+
+		node N_I2_F_PU N_I2_F_PD
+			attach N_I2_F_PU U2F.pin I2F.A
+			attach N_I2_F_PD D2F.pin I2F.B PISO2.D5
+
+	module load switch I2G
+		I2G.state = false
+		I2G.xpos = 72
+		I2G.ypos = 420
+
+		module load pullup U2G
+			U2G.xpos = 132
+			U2G.ypos = 684
+
+		module load pulldown D2G
+			D2G.xpos = 216
+			D2G.ypos = 684
+
+		node N_I2_G_PU N_I2_G_PD
+			attach N_I2_G_PU U2G.pin I2G.A
+			attach N_I2_G_PD D2G.pin I2G.B PISO2.D6
+
+	module load switch I2H
+		I2H.state = false
+		I2H.xpos = 12
+		I2H.ypos = 420
+
+		module load pullup U2H
+			U2H.xpos = 300
+			U2H.ypos = 684
+
+		module load pulldown D2H
+			D2H.xpos = 384
+			D2H.ypos = 684
+
+		node N_I2_H_PU N_I2_H_PD
+			attach N_I2_H_PU U2H.pin I2H.A
+			attach N_I2_H_PD D2H.pin I2H.B PISO2.D7
+
+module load ttl165 PISO1
+	PISO1.xpos = 72
+	PISO1.ypos = 60
+
+	node N_I_SER_RA1 N_I_QH_SER N_I_QH_RA0 N_I_CE_H N_I_SRCK_RA2 N_I_SRLOAD_RC2
+		attach N_I_SER_RA1 PISO2.Ds porta1
+		attach N_I_QH_SER PISO2.Q7 PISO1.Ds
+		attach N_I_QH_RA0 PISO1.Q7 porta0
+		attach N_I_CE_H PISO1.CE PISO2.CE zero
+		attach N_I_SRCK_RA2 PISO1.CP PISO2.CP porta2
+		attach N_I_SRLOAD_RC2 PISO1.PL PISO2.PL portc2
+
+#	module load led I1A
+#		I1A.color = blue
+#		I1A.xpos = 432
+#		I1A.ypos = 180
+
+	module load switch I1A
+		I1A.state = false
+		I1A.xpos = 432
+		I1A.ypos = 204
+
+		module load pullup U1A
+			U1A.xpos = 48
+			U1A.ypos = 504
+
+		module load pulldown D1A
+			D1A.xpos = 132
+			D1A.ypos = 504
+
+		node N_I1_A_PU N_I1_A_PD
+			attach N_I1_A_PU U1A.pin I1A.A
+			attach N_I1_A_PD D1A.pin I1A.B PISO1.D0
+#							vvvvvv This stimulus
+#								renders S1A useless
+#		attach N_I1_A_PD D1A.pin S1A.B PISO1.D0 I1A.in
+
+	module load switch I1B
+		I1B.state = false
+		I1B.xpos = 372
+		I1B.ypos = 204
+
+		module load pullup U1B
+			U1B.xpos = 216
+			U1B.ypos = 504
+
+		module load pulldown D1B
+			D1B.xpos = 300
+			D1B.ypos = 504
+
+		node N_I1_B_PU N_I1_B_PD
+			attach N_I1_B_PU U1B.pin I1B.A
+			attach N_I1_B_PD D1B.pin I1B.B PISO1.D1
+
+	module load switch I1C
+		I1C.state = false
+		I1C.xpos = 312
+		I1C.ypos = 204
+
+		module load pullup U1C
+			U1C.xpos = 384
+			U1C.ypos = 504
+
+		module load pulldown D1C
+			D1C.xpos = 468
+			D1C.ypos = 504
+
+		node N_I1_C_PU N_I1_C_PD
+			attach N_I1_C_PU U1C.pin I1C.A
+			attach N_I1_C_PD D1C.pin I1C.B PISO1.D2
+
+	module load switch I1D
+		I1D.state = false
+		I1D.xpos = 252
+		I1D.ypos = 204
+
+		module load pullup U1D
+			U1D.xpos = 552
+			U1D.ypos = 504
+
+		module load pulldown D1D
+			D1D.xpos = 636
+			D1D.ypos = 504
+
+		node N_I1_D_PU N_I1_D_PD
+			attach N_I1_D_PU U1D.pin I1D.A
+			attach N_I1_D_PD D1D.pin I1D.B PISO1.D3
+
+	module load switch I1E
+		I1E.state = false
+		I1E.xpos = 192
+		I1E.ypos = 204
+
+		module load pullup U1E
+			U1E.xpos = 720
+			U1E.ypos = 504
+
+		module load pulldown D1E
+			D1E.xpos = 48
+			D1E.ypos = 564
+
+		node N_I1_E_PU N_I1_E_PD
+			attach N_I1_E_PU U1E.pin I1E.A
+			attach N_I1_E_PD D1E.pin I1E.B PISO1.D4
+
+	module load switch I1F
+		I1F.state = false
+		I1F.xpos = 132
+		I1F.ypos = 204
+
+		module load pullup U1F
+			U1F.xpos = 132
+			U1F.ypos = 564
+
+		module load pulldown D1F
+			D1F.xpos = 216
+			D1F.ypos = 564
+
+		node N_I1_F_PU N_I1_F_PD
+			attach N_I1_F_PU U1F.pin I1F.A
+			attach N_I1_F_PD D1F.pin I1F.B PISO1.D5
+
+	module load switch I1G
+		I1G.state = false
+		I1G.xpos = 72
+		I1G.ypos = 204
+
+		module load pullup U1G
+			U1G.xpos = 300
+			U1G.ypos = 564
+
+		module load pulldown D1G
+			D1G.xpos = 384
+			D1G.ypos = 564
+
+		node N_I1_G_PU N_I1_G_PD
+			attach N_I1_G_PU U1G.pin I1G.A
+			attach N_I1_G_PD D1G.pin I1G.B PISO1.D6
+
+	module load switch I1H
+		I1H.state = false
+		I1H.xpos = 12
+		I1H.ypos = 204
+
+		module load pullup U1H
+			U1H.xpos = 468
+			U1H.ypos = 564
+
+		module load pulldown D1H
+			D1H.xpos = 552
+			D1H.ypos = 564
+
+		node N_I1_H_PU N_I1_H_PD
+			attach N_I1_H_PU U1H.pin I1H.A
+			attach N_I1_H_PD D1H.pin I1H.B PISO1.D7
+
+#	SIPO scope
+scope.ch0 = "porta5"
+scope.ch1 = "porta4"
+scope.ch2 = "portc5"
+
+#	PISO scope
+scope.ch3 = "porta0"
+scope.ch4 = "porta2"
+scope.ch5 = "portc2"
+scope.ch6 = "portc0"
