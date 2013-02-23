@@ -4,10 +4,10 @@
 	global		loopback_piso
 
 	extern		clear_piso
-
+;;
 ;;	Remove following after test
-	extern		load_piso
-
+;;	extern		load_piso
+;;
 	extern		mv_w_tx
 	extern		mv_rx_w
 	extern		push_w_piso
@@ -31,7 +31,7 @@ loopback_piso:
 ;;	The following instruction simulates the clear_piso
 ;;	function for the ttl165 model of gpsim, but must
 ;;	be removed upon test completion:
-	call		load_piso
+;;	call		load_piso
 push:
 	movlw		.4		;;	<< Prompt
 	call		mv_w_tx
@@ -44,6 +44,7 @@ push:
 	banksel		COUNT
 	decfsz		COUNT,1
 	goto		push
+	goto		loopback_piso
 finish:
 	return
 	end

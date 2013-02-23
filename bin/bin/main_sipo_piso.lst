@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE  1
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -58,7 +58,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
   00000002     00020 h += 1
   FFFFFFFD     00019 S#v(h)  equ     ~h
   00000003     00020 h += 1
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE  2
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -72,24 +72,24 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
   00000006     00020 h += 1
                00006 
                00007         extern          set_ports
-               00008         extern          mv_rx_w
-               00009         extern          mv_w_tx
-               00010         extern          sipo
-               00011         extern          piso
-               00012         extern          loopback_sipo
-               00013         extern          loopback_piso
-               00014 
-               00015 start   code            H'0000'
-0000 2000      00016         call            set_ports
-0001 2800      00017         goto            main
-               00018 
-               00019 prog    code
-0000 00020 main:
-0000 2000      00021         call            loopback_sipo
-0001 2000      00022         call            loopback_piso
-0002 00023 aa:
-0002 2800      00024         goto            aa
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE  3
+               00008         extern          greet
+               00009         extern          mv_rx_w
+               00010         extern          mv_w_tx
+               00011         extern          sipo
+               00012         extern          piso
+               00013         extern          loopback_sipo
+               00014         extern          loopback_piso
+               00015 
+               00016 start   code            H'0000'
+0000 2000      00017         call            set_ports
+0001 2800      00018         goto            main
+               00019 
+               00020 prog    code
+0000 00021 main:
+0000 2000      00022         call            greet
+0001 00023 aa:
+0001 2800      00024         goto            aa
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  3
 
 
 SYMBOL TABLE
@@ -148,7 +148,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE  4
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -208,7 +208,7 @@ EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
 EECON2                            0000018D
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE  5
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -268,7 +268,7 @@ NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
 NOT_PD                            00000003
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE  6
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -328,7 +328,7 @@ RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
 RCIF                              00000005
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE  7
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -388,7 +388,7 @@ T0IE                              00000005
 T0IF                              00000002
 T0SE                              00000004
 T1CKPS0                           00000004
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE  8
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -448,7 +448,7 @@ TUN0                              00000000
 TUN1                              00000001
 TUN2                              00000002
 TUN3                              00000003
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE  9
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -508,7 +508,7 @@ _EC_OSC                           00003FFB
 _EXTRC                            00003FFF
 _EXTRCIO                          00003FFE
 _EXTRC_OSC_CLKOUT                 00003FFF
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE 10
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -533,7 +533,8 @@ _WDT_OFF                          00003FF7
 _WDT_ON                           00003FFF
 _XT_OSC                           00003FF9
 __16F690                          00000001
-aa                                00000002
+aa                                00000001
+greet                             00000000
 h                                 00000006
 loopback_piso                     00000000
 loopback_sipo                     00000000
@@ -567,13 +568,13 @@ C_MOS                             8
 C_MOU                             11
 C_NULL                            0
 C_REG                             4
-C_REGPARM                         17
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-19-2013  18:33:10          PAGE 11
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+C_REGPARM                         17
 C_SECTION                         109
 C_STAT                            3
 C_STRTAG                          10

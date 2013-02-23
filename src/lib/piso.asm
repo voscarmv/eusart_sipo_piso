@@ -16,21 +16,24 @@ libsp	code
 piso:
 	movlw		.2		;;	<< Prompt
 	call		mv_w_tx
+	.direct		"c","Control.rx"
 	.direct		"c","Control.tx = 0x02"
 	call		mv_rx_w
 	movwf		COUNT
 	xorlw		.0
 	skpnz
 	goto		finish
+	call		clear_piso
 	call		load_piso
 ser_in:
 	call		mv_piso_w
 	call		mv_w_tx
+	.direct		"c","Control.rx"
 	banksel		COUNT
 	decfsz		COUNT,1
 	.direct		"c","Control.rx"
 	goto		ser_in
-;;	goto		piso
+	goto		piso
 finish:
 	return
 	end

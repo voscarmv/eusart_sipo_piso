@@ -1,6 +1,6 @@
 gplink-0.13.7 beta
 Copyright (c) 1998-2005 gputils project
-Listing File Generated: 2-19-2013  19:08:17
+Listing File Generated: 2-23-2013  17:31:36
  
  
 Address  Value    Disassembly              Source
@@ -55,6 +55,7 @@ Address  Value    Disassembly              Source
                                            	endw
                                            
                                            	extern		set_ports
+                                           	extern		greet
                                            	extern		mv_rx_w
                                            	extern		mv_w_tx
                                            	extern		sipo
@@ -63,15 +64,188 @@ Address  Value    Disassembly              Source
                                            	extern		loopback_piso
                                            
                                            start	code		H'0000'
-000000   2002     call	0x2                 	call		set_ports
-000001   293e     goto	0x13e               	goto		main
+000000   2039     call	0x39                	call		set_ports
+000001   2881     goto	0x81                	goto		main
                                            
                                            prog	code
                                            main:
-00013e   20c9     call	0xc9                	call		loopback_sipo
-00013f   2014     call	0x14                	call		loopback_piso
+000081   2002     call	0x2                 	call		greet
                                            aa:
-000140   2940     goto	0x140               	goto		aa
+000082   2882     goto	0x82                	goto		aa
+                                           	end
+                                           	processor	pic16f690
+                                           	include		<p16f690.inc>
+                                                   LIST
+                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
+                                                   NOLIST
+                                           
+                                           	extern		mv_rx_w
+                                           	extern		mv_w_tx
+                                           
+                                           	global		greet
+                                           
+                                           	udata
+                                           FLAGS	res		1
+                                           GSIG	res		1
+                                           
+                                           libsp	code
+                                           greet:
+                                           ;;	Signals:
+                                           ;;	Byte	Signal			Function
+                                           ;;	.7	Interface-distress	Send to Control, expect Control-response
+                                           ;;	.8	Control-response	Send to Interface after receiving Interface-distress
+                                           ;;					and expect Interface-confirm
+                                           ;;	.9	Interface-confirm	Send to Control after receiving Control-response
+                                           ;;	.10	Control-distress	Send to Interface, expect Interface-response
+                                           ;;	.11	Interface-response	Send to Control after receiving Control-distress
+                                           ;;					and expect Control-confirm
+                                           ;;	.12	Control-confirm		Send to Interface after receiving Interface-response
+                                           
+                                           ;;	Flags:
+                                           ;;	(All flags are set by default)
+                                           ;;	Bit	Flag			Function
+                                           ;;	0	C_DISTRESS_PENDING	Interface is expecting Control-distress.
+                                           ;;					Therefor: C_DISTRESS_PENDING = 1
+                                           ;;					When Control-distress is received, this is unset.
+                                           ;;	1	C_RESPONSE_PENDING	Interface-distress was sent AND received by Control,
+                                           ;;					Interface is now expecting a Control-response signal
+                                           ;;					Therefor: C_RESPONSE_PENDING = 1
+                                           ;;					When Control-response is received, this is unset.
+                                           ;;	2	C_CONFIRM_PENDING	Control-distress was received and responded by
+                                           ;;					Interface with an Interface-response. Interface
+                                           ;;					is therefor expecting a Control-confirm.
+                                           ;;					Therefor: C_CONFIRM_PENDING = 1
+                                           ;;					When Control-confirm is received, this is unset.
+                                           ;;	3	ITX_IRX			Interface-distress was sent and Control-response
+                                           ;;					was received in exchange. Interface-confirm will be
+                                           ;;					sent to Control.
+                                           ;;					Therefor: ITX_IRX = 0
+                                           ;;					Otherwise, this is set.
+                                           ;;	4	CTX_CRX			Control-distress was received and responded with
+                                           ;;					Interface-response by Interface. Then, Control
+                                           ;;					sent Control-confirm and Interface received this.
+                                           ;;					Therefor: CTX_CRX = 0
+                                           ;;					Otherwise, this is set.
+                                           
+                                           ;;	It can be said that ITX_IRX=0 only when C_RESPONSE_PENDING is 0, and
+                                           ;;	CTX_CRX=0 only when C_DISTRESS_PENDING = C_CONFIRM_PENDING = 0
+                                           
+                                           ;;	Set flags
+000002   1283     bcf	0x3, 0x5             	banksel		FLAGS
+000003   1303     bcf	0x3, 0x6             
+000004   301f     movlw	0x1f               	movlw		B'00011111'
+000005   1283     bcf	0x3, 0x5             	banksel		FLAGS
+000006   1303     bcf	0x3, 0x6             
+000007   00a0     movwf	0x20               	movwf		FLAGS
+                                           
+                                           ;;	Break loop
+                                           break:
+000008   1283     bcf	0x3, 0x5             	banksel		FLAGS
+000009   1303     bcf	0x3, 0x6             
+00000a   0820     movf	0x20, w             	movfw		FLAGS
+00000b   3a00     xorlw	0                  	xorlw		.0
+00000c   1903     btfsc	0x3, 0x2           	skpnz
+00000d   2838     goto	0x38                	goto		finish
+                                           
+                                           ;;	Transmission
+                                           transmit:
+00000e   1283     bcf	0x3, 0x5             	banksel		FLAGS
+00000f   1303     bcf	0x3, 0x6             
+000010   1ca0     btfss	0x20, 0x1          	btfss		FLAGS,1
+000011   2815     goto	0x15                	goto		else1
+                                           ;;
+                                           ;;	if C_RESPONSE_PENDING (FLAGS,1) == 1 ; then
+                                           ;;
+000012   3007     movlw	0x7                	movlw		.7		;;	<< Send Interface-distress
+000013   2053     call	0x53                	call		mv_w_tx
+                                           	.direct		"c","Control.rx"
+000014   2817     goto	0x17                	goto		fi1
+                                           ;;
+                                           ;;	else
+                                           ;;
+                                           else1:
+000015   3009     movlw	0x9                	movlw		.9		;;	<< Send Interface-confirm
+000016   2053     call	0x53                	call		mv_w_tx
+                                           	.direct		"c","Control.rx"
+                                           ;;
+                                           ;;	fi
+                                           ;;
+                                           fi1:
+                                           
+000017   1283     bcf	0x3, 0x5             	banksel		FLAGS
+000018   1303     bcf	0x3, 0x6             
+000019   0820     movf	0x20, w             	movfw		FLAGS
+00001a   3905     andlw	0x5                	andlw		B'00000101'
+00001b   3a04     xorlw	0x4                	xorlw		B'00000100'
+00001c   1d03     btfss	0x3, 0x2           	skpz
+00001d   2820     goto	0x20                	goto		fi2
+                                           ;;
+                                           ;;	if C_DISTRESS_PENDING (FLAGS,0) == 0 && C_CONFIRM_PENDING (FLAGS,2) == 1 ; then
+                                           ;;
+00001e   300b     movlw	0xb                	movlw		.11		;;	<< Send Interface-response
+00001f   2053     call	0x53                	call		mv_w_tx
+                                           	.direct		"c","Control.rx"
+                                           ;;
+                                           ;;	fi
+                                           ;;
+                                           fi2:
+                                           
+                                           ;;	Sample RX byte
+                                           sample:
+                                           	.direct		"c","Control.tx=8"
+000020   1283     bcf	0x3, 0x5             	banksel		PIR1
+000021   1303     bcf	0x3, 0x6             
+000022   1e8c     btfss	0xc, 0x5           	btfss		PIR1,5
+000023   2808     goto	0x8                 	goto		break
+                                           
+                                           ;;	Reception
+                                           receive:
+000024   204b     call	0x4b                	call		mv_rx_w
+000025   1283     bcf	0x3, 0x5             	banksel		GSIG
+000026   1303     bcf	0x3, 0x6             
+000027   00a1     movwf	0x21               	movwf		GSIG
+000028   3a0a     xorlw	0xa                	xorlw		.10
+000029   1903     btfsc	0x3, 0x2           	skpnz
+                                           ;;
+                                           ;;	if SIGNAL == Control-distress ; then
+                                           ;;
+                                           	.direct		"c","Control.tx"
+00002a   1020     bcf	0x20, 0              	bcf		FLAGS,0		;;	<< Clear C_DISTRESS_PENDING
+                                           ;;
+                                           ;;	fi
+                                           ;;
+                                           
+00002b   0821     movf	0x21, w             	movfw		GSIG
+00002c   3a08     xorlw	0x8                	xorlw		.8
+00002d   1d03     btfss	0x3, 0x2           	skpz
+00002e   2831     goto	0x31                	goto		fi3
+                                           ;;
+                                           ;;	if SIGNAL == Control-response ; then
+                                           ;;
+00002f   10a0     bcf	0x20, 0x1            	bcf		FLAGS,1		;;	<< Clear C_RESPONSE_PENDING
+000030   11a0     bcf	0x20, 0x3            	bcf		FLAGS,3		;;	<< Clear ITX_IRX
+                                           ;;
+                                           ;;	fi
+                                           ;;
+                                           fi3:
+                                           
+000031   0821     movf	0x21, w             	movfw		GSIG
+000032   3a0c     xorlw	0xc                	xorlw		.12
+000033   1d03     btfss	0x3, 0x2           	skpz
+000034   2837     goto	0x37                	goto		fi4
+                                           ;;
+                                           ;;	if SIGNAL == Control-confirm ; then
+                                           ;;
+000035   1120     bcf	0x20, 0x2            	bcf		FLAGS,2		;;	<< Clear C_CONFIRM_PENDING
+000036   1220     bcf	0x20, 0x4            	bcf		FLAGS,4		;;	<< Clear CTX_CRX
+                                           ;;
+                                           ;;	fi
+                                           ;;
+                                           fi4:
+                                           
+000037   2808     goto	0x8                 	goto		break
+                                           finish:
+000038   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -87,10 +261,10 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            set_ports:
-000002   2088     call	0x88                	call		set_anselh_ansel	;;	<< Initial pinout / EUSART settings
-000003   2006     call	0x6                 	call		set_pinout_tris		;;	<<
-000004   209e     call	0x9e                	call		set_eusart_19200	;;	<<
-000005   0008     return                   	return
+000039   205b     call	0x5b                	call		set_anselh_ansel	;;	<< Initial pinout / EUSART settings
+00003a   203d     call	0x3d                	call		set_pinout_tris		;;	<<
+00003b   2062     call	0x62                	call		set_eusart_19200	;;	<<
+00003c   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -102,19 +276,19 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            set_pinout_tris:
-000006   1683     bsf	0x3, 0x5             	banksel		TRISA		;;	<< These settings provide the following
-000007   1303     bcf	0x3, 0x6             
-000008   3009     movlw	0x9                	movlw		B'00001001'	;;	<< configuration for the physical terminals
-000009   0085     movwf	0x5                	movwf		TRISA		;;	<< of the PIC16F690:
-00000a   3020     movlw	0x20               	movlw		B'00100000'	;;	<<
-00000b   0086     movwf	0x6                	movwf		TRISB		;;	<< PORT	PIN	I/O	NAME	FUNCTION
-00000c   3000     movlw	0                  	movlw		B'00000000'	;;	<< RA3	4	I	DISIPO	Ser data in
-00000d   0087     movwf	0x7                	movwf		TRISC		;;	<< RA5	2	O	DOSIPO	Ser data out
-00000e   1283     bcf	0x3, 0x5             	banksel		PORTA		;;	   RA4	3	O	CKSIPO	Clock out
-00000f   1303     bcf	0x3, 0x6             
-000010   0185     clrf	0x5                 	clrf		PORTA		;;	   RC5	5	O	LDSIPO	Load D out
-000011   0186     clrf	0x6                 	clrf		PORTB		;;	   RC4	6	O	CRSIPO	Clear out
-000012   0187     clrf	0x7                 	clrf		PORTC		;;	   RA0	19	I	DIPISO	Ser data in
+00003d   1683     bsf	0x3, 0x5             	banksel		TRISA		;;	<< These settings provide the following
+00003e   1303     bcf	0x3, 0x6             
+00003f   3009     movlw	0x9                	movlw		B'00001001'	;;	<< configuration for the physical terminals
+000040   0085     movwf	0x5                	movwf		TRISA		;;	<< of the PIC16F690:
+000041   3020     movlw	0x20               	movlw		B'00100000'	;;	<<
+000042   0086     movwf	0x6                	movwf		TRISB		;;	<< PORT	PIN	I/O	NAME	FUNCTION
+000043   3000     movlw	0                  	movlw		B'00000000'	;;	<< RA3	4	I	DISIPO	Ser data in
+000044   0087     movwf	0x7                	movwf		TRISC		;;	<< RA5	2	O	DOSIPO	Ser data out
+000045   1283     bcf	0x3, 0x5             	banksel		PORTA		;;	   RA4	3	O	CKSIPO	Clock out
+000046   1303     bcf	0x3, 0x6             
+000047   0185     clrf	0x5                 	clrf		PORTA		;;	   RC5	5	O	LDSIPO	Load D out
+000048   0186     clrf	0x6                 	clrf		PORTB		;;	   RC4	6	O	CRSIPO	Clear out
+000049   0187     clrf	0x7                 	clrf		PORTC		;;	   RA0	19	I	DIPISO	Ser data in
                                            					;;	   RA1	18	O	DOPISO	Ser data out
                                            					;;	   RA2	17	O	CKPISO	Clock out
                                            					;;	   RC0	16	O	LD1PISO	Load D1 out
@@ -122,261 +296,7 @@ Address  Value    Disassembly              Source
                                            					;;	   RC1	15	O	CRPISO	Clear out
                                            					;;	   RB5	12	I	RX	RX in
                                            					;;	   RB7	10	O	TX	TX out
-000013   0008     return                   	return
-                                           	end
-                                           	processor	pic16f690
-                                           	include		<p16f690.inc>
-                                                   LIST
-                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
-                                                   NOLIST
-                                           
-                                           	global		loopback_piso
-                                           
-                                           	extern		clear_piso
-                                           
-                                           ;;	Remove following after test
-                                           	extern		load_piso
-                                           
-                                           	extern		mv_w_tx
-                                           	extern		mv_rx_w
-                                           	extern		push_w_piso
-                                           	extern		pop_piso_w
-                                           
-                                           	udata
-                                           COUNT	res		1
-                                           
-                                           libsp	code
-                                           loopback_piso:
-000014   3003     movlw	0x3                	movlw		.3		;;	<< Prompt
-000015   2080     call	0x80                	call		mv_w_tx
-                                           	.direct		"c","Control.rx"
-                                           	.direct		"c","Control.tx = 0x03"
-000016   20c1     call	0xc1                	call		mv_rx_w
-000017   00a0     movwf	0x20               	movwf		COUNT
-000018   3a00     xorlw	0                  	xorlw		.0
-000019   1903     btfsc	0x3, 0x2           	skpnz
-00001a   2827     goto	0x27                	goto		finish
-00001b   208f     call	0x8f                	call		clear_piso
-                                           ;;	The following instruction simulates the clear_piso
-                                           ;;	function for the ttl165 model of gpsim, but must
-                                           ;;	be removed upon test completion:
-00001c   2095     call	0x95                	call		load_piso
-                                           push:
-00001d   3004     movlw	0x4                	movlw		.4		;;	<< Prompt
-00001e   2080     call	0x80                	call		mv_w_tx
-                                           	.direct		"c","Control.rx"
-                                           	.direct		"c","Control.tx = 0xF7"
-00001f   20c1     call	0xc1                	call		mv_rx_w
-000020   2028     call	0x28                	call		push_w_piso
-000021   20bd     call	0xbd                	call		pop_piso_w
-000022   2080     call	0x80                	call		mv_w_tx
-000023   1283     bcf	0x3, 0x5             	banksel		COUNT
-000024   1303     bcf	0x3, 0x6             
-000025   0ba0     decfsz	0x20, f           	decfsz		COUNT,1
-000026   281d     goto	0x1d                	goto		push
-                                           finish:
-000027   0008     return                   	return
-                                           	end
-                                           ;;	Push a byte into PISO daisychain, bit by bit. At the same time,
-                                           ;;	with each pushed bit, record the popped bit on the other side of
-                                           ;;	the daisychain, into a 1 byte register, until this register is
-                                           ;;	filled.
-                                           	processor	pic16f690
-                                           	include		<p16f690.inc>
-                                                   LIST
-                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
-                                                   NOLIST
-                                           
-                                           	variable	i
-                                           
-                                           	global		push_w_piso
-                                           	global		FRPISO
-                                           
-                                           	udata
-                                           TOPISO	res		1
-                                           FRPISO	res		1
-                                           
-                                           libsp	code
-                                           push_w_piso:
-                                           ;;	This is pretty much the same as mv_w_sipo, except that with an
-                                           ;;	interwined read function to record one bit at a time from the
-                                           ;;	serial input terminal.
-                                           
-                                           ;;	Transmit the contents of WREG through DOPISO synchronously with CKPISO,
-                                           ;;	storin theg the byte received through DIPISO in FRPISO global register.
-                                           
-                                           ;;	PORT	PIN	I/O	NAME	FUNCTION
-                                           ;;	RA1	18	O	DOPISO	Ser data out
-                                           ;;	RA2	17	O	CKPISO	Clock out
-                                           ;;	RA0	19	I	DIPISO	Ser data in
-                                           
-000028   1283     bcf	0x3, 0x5             	banksel		PORTA
-000029   1303     bcf	0x3, 0x6             
-00002a   1085     bcf	0x5, 0x1             	bcf		PORTA,1
-00002b   1105     bcf	0x5, 0x2             	bcf		PORTA,2
-00002c   1005     bcf	0x5, 0               	bcf		PORTA,0
-                                           
-00002d   00a1     movwf	0x21               	movwf		TOPISO
-00002e   01a2     clrf	0x22                	clrf		FRPISO
-                                           
-                                           i = 8
-                                           	while		i > 0
-                                           
-00002f   1ba1     btfsc	0x21, 0x7          	btfsc		TOPISO,i-1
-000030   1485     bsf	0x5, 0x1             	bsf		PORTA,1
-000031   1fa1     btfss	0x21, 0x7          	btfss		TOPISO,i-1
-000032   1085     bcf	0x5, 0x1             	bcf		PORTA,1
-                                           
-000033   1805     btfsc	0x5, 0             	btfsc		PORTA,0
-000034   17a2     bsf	0x22, 0x7            	bsf		FRPISO,i-1
-000035   1c05     btfss	0x5, 0             	btfss		PORTA,0
-000036   13a2     bcf	0x22, 0x7            	bcf		FRPISO,i-1
-                                           
-000037   1505     bsf	0x5, 0x2             	bsf		PORTA,2
-000038   1105     bcf	0x5, 0x2             	bcf		PORTA,2
-                                           
-                                           i -= 1
-                                           	endw
-                                           
-00007f   0008     return                   	return
-                                           	end
-                                           	processor	pic16f690
-                                           	include		<p16f690.inc>
-                                                   LIST
-                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
-                                                   NOLIST
-                                           
-                                           	global		mv_w_tx
-                                           
-                                           libsp	code
-                                           mv_w_tx:
-000080   1283     bcf	0x3, 0x5             	banksel		TXREG		;;	<< Move the contents of WREG to TXREG
-000081   1303     bcf	0x3, 0x6             
-000082   0099     movwf	0x19               	movwf		TXREG		;;	<<
-                                           
-000083   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< Pause execution until TRMT (TXSTA,1)
-000084   1303     bcf	0x3, 0x6             
-000085   1c98     btfss	0x18, 0x1          	btfss		TXSTA,1		;;	<< is set again. i.e. until the byte
-000086   2885     goto	0x85                	goto		$-1		;;	<< transmission completes
-000087   0008     return                   	return
-                                           	end
-                                           	processor	pic16f690
-                                           	include		<p16f690.inc>
-                                                   LIST
-                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
-                                                   NOLIST
-                                           
-                                           	global		set_anselh_ansel
-                                           
-                                           libsp	code
-                                           set_anselh_ansel:
-000088   1283     bcf	0x3, 0x5             	banksel		ANSEL		;;	<< ANSELH:ANSEL Settings
-000089   1703     bsf	0x3, 0x6             
-00008a   019e     clrf	0x1e                	clrf		ANSEL		;;	<<
-00008b   1283     bcf	0x3, 0x5             	banksel		ANSELH		;;	<<
-00008c   1703     bsf	0x3, 0x6             
-00008d   019f     clrf	0x1f                	clrf		ANSELH		;;	<<
-00008e   0008     return                   	return
-                                           	end
-                                           	processor	pic16f690
-                                           	include		<p16f690.inc>
-                                                   LIST
-                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
-                                                   NOLIST
-                                           
-                                           	global		clear_piso
-                                           
-                                           libsp	code
-                                           clear_piso:
-00008f   1283     bcf	0x3, 0x5             	banksel		PORTC
-000090   1303     bcf	0x3, 0x6             
-000091   1487     bsf	0x7, 0x1             	bsf		PORTC,1
-000092   1087     bcf	0x7, 0x1             	bcf		PORTC,1
-000093   1487     bsf	0x7, 0x1             	bsf		PORTC,1
-000094   0008     return                   	return
-                                           	end
-                                           	processor	pic16f690
-                                           	include		<p16f690.inc>
-                                                   LIST
-                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
-                                                   NOLIST
-                                           
-                                           	global		load_piso
-                                           
-                                           libsp	code
-                                           load_piso:
-000095   1283     bcf	0x3, 0x5             	banksel		PORTC
-000096   1303     bcf	0x3, 0x6             
-000097   1007     bcf	0x7, 0               	bcf		PORTC,0
-000098   1407     bsf	0x7, 0               	bsf		PORTC,0
-000099   1007     bcf	0x7, 0               	bcf		PORTC,0
-00009a   1507     bsf	0x7, 0x2             	bsf		PORTC,2
-00009b   1107     bcf	0x7, 0x2             	bcf		PORTC,2
-00009c   1507     bsf	0x7, 0x2             	bsf		PORTC,2
-00009d   0008     return                   	return
-                                           	end
-                                           	processor	pic16f690
-                                           	include		<p16f690.inc>
-                                                   LIST
-                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
-                                                   NOLIST
-                                           
-                                           	global		set_eusart_19200
-                                           
-                                           libsp	code
-                                           set_eusart_19200:
-00009e   1283     bcf	0x3, 0x5             	banksel		INTCON		;;	<< These settings configure interrupt
-00009f   1303     bcf	0x3, 0x6             
-0000a0   138b     bcf	0xb, 0x7             	bcf		INTCON,7	;;	<< functions for the PIC16F690 EUSART.
-0000a1   130b     bcf	0xb, 0x6             	bcf		INTCON,6	;;	<<
-0000a2   1683     bsf	0x3, 0x5             	banksel		PIE1		;;	<<
-0000a3   1303     bcf	0x3, 0x6             
-0000a4   128c     bcf	0xc, 0x5             	bcf		PIE1,5		;;	<<
-                                           
-0000a5   1683     bsf	0x3, 0x5             	banksel		SPBRGH		;;	<< These settings assign the following
-0000a6   1303     bcf	0x3, 0x6             
-0000a7   019a     clrf	0x1a                	clrf		SPBRGH		;;	<< values to the PIC16F690 EUSART:
-0000a8   1683     bsf	0x3, 0x5             	banksel		SPBRG		;;	<<
-0000a9   1303     bcf	0x3, 0x6             
-0000aa   300c     movlw	0xc                	movlw		D'12'		;;	<< FOSC		= 4 MHz
-0000ab   0099     movwf	0x19               	movwf		SPBRG		;;	<< SYNC		= 0
-0000ac   1683     bsf	0x3, 0x5             	banksel		BAUDCTL		;;	<< BRGH		= 1
-0000ad   1303     bcf	0x3, 0x6             
-0000ae   119b     bcf	0x1b, 0x3            	bcf		BAUDCTL,3	;;	<< BRG16	= 0
-0000af   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< SPBRGH:SPBRG	= 12
-0000b0   1303     bcf	0x3, 0x6             
-0000b1   1518     bsf	0x18, 0x2            	bsf		TXSTA,2		;;	<< BR           = 19200
-0000b2   1218     bcf	0x18, 0x4            	bcf		TXSTA,4		;;	<< ACTBR        = 19.23 k
-0000b3   1198     bcf	0x18, 0x3            	bcf		TXSTA,3		;;	<< ERROR        = 0.16 %
-0000b4   1698     bsf	0x18, 0x5            	bsf		TXSTA,5		;;	<<
-0000b5   1318     bcf	0x18, 0x6            	bcf		TXSTA,6		;;	<<
-0000b6   1283     bcf	0x3, 0x5             	banksel		RCSTA		;;	<<
-0000b7   1303     bcf	0x3, 0x6             
-0000b8   1198     bcf	0x18, 0x3            	bcf		RCSTA,3		;;	<<
-0000b9   1618     bsf	0x18, 0x4            	bsf		RCSTA,4		;;	<<
-0000ba   1318     bcf	0x18, 0x6            	bcf		RCSTA,6		;;	<<
-0000bb   1798     bsf	0x18, 0x7            	bsf		RCSTA,7		;;	<<
-0000bc   0008     return                   	return
-                                           	end
-                                           ;;	push_w_piso stores the byte popped from the other side of the
-                                           ;;	daisychain into a register. Well, pop_piso_w stores that value
-                                           ;;	in WREG.
-                                           	processor	pic16f690
-                                           	include		<p16f690.inc>
-                                                   LIST
-                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
-                                                   NOLIST
-                                           
-                                           	global		pop_piso_w
-                                           
-                                           	extern		FRPISO
-                                           
-                                           libsp	code
-                                           pop_piso_w:
-0000bd   1283     bcf	0x3, 0x5             	banksel		FRPISO
-0000be   1303     bcf	0x3, 0x6             
-0000bf   0822     movf	0x22, w             	movfw		FRPISO
-0000c0   0008     return                   	return
+00004a   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -388,15 +308,15 @@ Address  Value    Disassembly              Source
                                            
                                            libsp	code
                                            mv_rx_w:
-0000c1   1283     bcf	0x3, 0x5             	banksel		PIR1		;;	<< Pause execution until a whole byte
-0000c2   1303     bcf	0x3, 0x6             
-0000c3   1e8c     btfss	0xc, 0x5           	btfss		PIR1,5		;;	<< has been received and stored in register
-0000c4   28c3     goto	0xc3                	goto		$-1		;;	<< RCREG via RX (RB5, pin 12)
+00004b   1283     bcf	0x3, 0x5             	banksel		PIR1		;;	<< Pause execution until a whole byte
+00004c   1303     bcf	0x3, 0x6             
+00004d   1e8c     btfss	0xc, 0x5           	btfss		PIR1,5		;;	<< has been received and stored in register
+00004e   284d     goto	0x4d                	goto		$-1		;;	<< RCREG via RX (RB5, pin 12)
                                            
-0000c5   1283     bcf	0x3, 0x5             	banksel		RCREG		;;	<< Store the contents of RCREG in WREG.
-0000c6   1303     bcf	0x3, 0x6             
-0000c7   081a     movf	0x1a, w             	movfw		RCREG		;;	<<
-0000c8   0008     return                   	return
+00004f   1283     bcf	0x3, 0x5             	banksel		RCREG		;;	<< Store the contents of RCREG in WREG.
+000050   1303     bcf	0x3, 0x6             
+000051   081a     movf	0x1a, w             	movfw		RCREG		;;	<<
+000052   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -404,108 +324,19 @@ Address  Value    Disassembly              Source
                                            ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
                                                    NOLIST
                                            
-                                           	global		loopback_sipo
-                                           
-                                           	extern		clear_sipo
-                                           	extern		mv_w_tx
-                                           	extern		mv_rx_w
-                                           	extern		push_w_sipo
-                                           	extern		pop_sipo_w
-                                           
-                                           	udata
-                                           COUNT	res		1
+                                           	global		mv_w_tx
                                            
                                            libsp	code
-                                           loopback_sipo:
-0000c9   3005     movlw	0x5                	movlw		.5		;;	<< Prompt
-0000ca   2080     call	0x80                	call		mv_w_tx
-                                           	.direct		"c","Control.rx"
-                                           	.direct		"c","Control.tx = 0x03"
-0000cb   20c1     call	0xc1                	call		mv_rx_w
-0000cc   00a3     movwf	0x23               	movwf		COUNT
-0000cd   3a00     xorlw	0                  	xorlw		.0
-0000ce   1903     btfsc	0x3, 0x2           	skpnz
-0000cf   28db     goto	0xdb                	goto		finish
-0000d0   2134     call	0x134               	call		clear_sipo
-                                           push:
-0000d1   3006     movlw	0x6                	movlw		.6		;;	<< Prompt
-0000d2   2080     call	0x80                	call		mv_w_tx
-                                           	.direct		"c","Control.rx"
-                                           	.direct		"c","Control.tx = 0xF8"
-0000d3   20c1     call	0xc1                	call		mv_rx_w
-0000d4   20dc     call	0xdc                	call		push_w_sipo
-0000d5   213a     call	0x13a               	call		pop_sipo_w
-0000d6   2080     call	0x80                	call		mv_w_tx
-0000d7   1283     bcf	0x3, 0x5             	banksel		COUNT
-0000d8   1303     bcf	0x3, 0x6             
-0000d9   0ba3     decfsz	0x23, f           	decfsz		COUNT,1
-0000da   28d1     goto	0xd1                	goto		push
-                                           ;;	goto		loopback_sipo
-                                           finish:
-0000db   0008     return                   	return
-                                           	end
-                                           ;;	Push a byte into SIPO daisychain, bit by bit. At the same time,
-                                           ;;	with each pushed bit, record the popped bit on the other side of
-                                           ;;	the daisychain, into a 1 byte register, until this register is
-                                           ;;	filled.
-                                           	processor	pic16f690
-                                           	include		<p16f690.inc>
-                                                   LIST
-                                           ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
-                                                   NOLIST
+                                           mv_w_tx:
+000053   1283     bcf	0x3, 0x5             	banksel		TXREG		;;	<< Move the contents of WREG to TXREG
+000054   1303     bcf	0x3, 0x6             
+000055   0099     movwf	0x19               	movwf		TXREG		;;	<<
                                            
-                                           	variable	i
-                                           
-                                           	global		push_w_sipo
-                                           	global		FRSIPO
-                                           
-                                           	udata
-                                           TOSIPO	res		1
-                                           FRSIPO	res		1
-                                           
-                                           libsp	code
-                                           push_w_sipo:
-                                           ;;	This is pretty much the same as mv_w_sipo, except that with an
-                                           ;;	interwined read function to record one bit at a time from the
-                                           ;;	serial input terminal.
-                                           
-                                           ;;	Transmit the contents of WREG through DOSIPO synchronously with CKSIPO,
-                                           ;;	storin theg the byte received through DISIPO in FRSIPO global register.
-                                           
-                                           ;;	PORT	PIN	I/O	NAME	FUNCTION
-                                           ;;	RA5	2	O	DOSIPO	Ser data out
-                                           ;;	RA4	3	O	CKSIPO	Clock out
-                                           ;;	RA3	4	I	DISIPO	Ser data in
-                                           
-0000dc   1283     bcf	0x3, 0x5             	banksel		PORTA
-0000dd   1303     bcf	0x3, 0x6             
-0000de   1285     bcf	0x5, 0x5             	bcf		PORTA,5
-0000df   1205     bcf	0x5, 0x4             	bcf		PORTA,4
-0000e0   1185     bcf	0x5, 0x3             	bcf		PORTA,3
-                                           
-0000e1   00a4     movwf	0x24               	movwf		TOSIPO
-0000e2   01a5     clrf	0x25                	clrf		FRSIPO
-                                           
-                                           i = 8
-                                           	while		i > 0
-                                           
-0000e3   1ba4     btfsc	0x24, 0x7          	btfsc		TOSIPO,i-1
-0000e4   1685     bsf	0x5, 0x5             	bsf		PORTA,5
-0000e5   1fa4     btfss	0x24, 0x7          	btfss		TOSIPO,i-1
-0000e6   1285     bcf	0x5, 0x5             	bcf		PORTA,5
-                                           
-0000e7   1605     bsf	0x5, 0x4             	bsf		PORTA,4
-0000e8   1205     bcf	0x5, 0x4             	bcf		PORTA,4
-                                           
-0000e9   1985     btfsc	0x5, 0x3           	btfsc		PORTA,3
-0000ea   17a5     bsf	0x25, 0x7            	bsf		FRSIPO,i-1
-0000eb   1d85     btfss	0x5, 0x3           	btfss		PORTA,3
-0000ec   13a5     bcf	0x25, 0x7            	bcf		FRSIPO,i-1
-                                           
-                                           i -= 1
-                                           	endw
-                                           
-000133   0008     return                   	return
+000056   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< Pause execution until TRMT (TXSTA,1)
+000057   1303     bcf	0x3, 0x6             
+000058   1c98     btfss	0x18, 0x1          	btfss		TXSTA,1		;;	<< is set again. i.e. until the byte
+000059   2858     goto	0x58                	goto		$-1		;;	<< transmission completes
+00005a   0008     return                   	return
                                            	end
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
@@ -513,34 +344,58 @@ Address  Value    Disassembly              Source
                                            ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
                                                    NOLIST
                                            
-                                           	global		clear_sipo
+                                           	global		set_anselh_ansel
                                            
                                            libsp	code
-                                           clear_sipo:
-000134   1283     bcf	0x3, 0x5             	banksel		PORTC
-000135   1303     bcf	0x3, 0x6             
-000136   1607     bsf	0x7, 0x4             	bsf		PORTC,4
-000137   1207     bcf	0x7, 0x4             	bcf		PORTC,4
-000138   1607     bsf	0x7, 0x4             	bsf		PORTC,4
-000139   0008     return                   	return
+                                           set_anselh_ansel:
+00005b   1283     bcf	0x3, 0x5             	banksel		ANSEL		;;	<< ANSELH:ANSEL Settings
+00005c   1703     bsf	0x3, 0x6             
+00005d   019e     clrf	0x1e                	clrf		ANSEL		;;	<<
+00005e   1283     bcf	0x3, 0x5             	banksel		ANSELH		;;	<<
+00005f   1703     bsf	0x3, 0x6             
+000060   019f     clrf	0x1f                	clrf		ANSELH		;;	<<
+000061   0008     return                   	return
                                            	end
-                                           ;;	push_w_sipo stores the byte popped from the other side of the
-                                           ;;	daisychain into a register. Well, pop_sipo_w stores that value
-                                           ;;	in WREG.
                                            	processor	pic16f690
                                            	include		<p16f690.inc>
                                                    LIST
                                            ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
                                                    NOLIST
                                            
-                                           	global		pop_sipo_w
-                                           
-                                           	extern		FRSIPO
+                                           	global		set_eusart_19200
                                            
                                            libsp	code
-                                           pop_sipo_w:
-00013a   1283     bcf	0x3, 0x5             	banksel		FRSIPO
-00013b   1303     bcf	0x3, 0x6             
-00013c   0825     movf	0x25, w             	movfw		FRSIPO
-00013d   0008     return                   	return
+                                           set_eusart_19200:
+000062   1283     bcf	0x3, 0x5             	banksel		INTCON		;;	<< These settings configure interrupt
+000063   1303     bcf	0x3, 0x6             
+000064   138b     bcf	0xb, 0x7             	bcf		INTCON,7	;;	<< functions for the PIC16F690 EUSART.
+000065   130b     bcf	0xb, 0x6             	bcf		INTCON,6	;;	<<
+000066   1683     bsf	0x3, 0x5             	banksel		PIE1		;;	<<
+000067   1303     bcf	0x3, 0x6             
+000068   128c     bcf	0xc, 0x5             	bcf		PIE1,5		;;	<<
+                                           
+000069   1683     bsf	0x3, 0x5             	banksel		SPBRGH		;;	<< These settings assign the following
+00006a   1303     bcf	0x3, 0x6             
+00006b   019a     clrf	0x1a                	clrf		SPBRGH		;;	<< values to the PIC16F690 EUSART:
+00006c   1683     bsf	0x3, 0x5             	banksel		SPBRG		;;	<<
+00006d   1303     bcf	0x3, 0x6             
+00006e   300c     movlw	0xc                	movlw		D'12'		;;	<< FOSC		= 4 MHz
+00006f   0099     movwf	0x19               	movwf		SPBRG		;;	<< SYNC		= 0
+000070   1683     bsf	0x3, 0x5             	banksel		BAUDCTL		;;	<< BRGH		= 1
+000071   1303     bcf	0x3, 0x6             
+000072   119b     bcf	0x1b, 0x3            	bcf		BAUDCTL,3	;;	<< BRG16	= 0
+000073   1683     bsf	0x3, 0x5             	banksel		TXSTA		;;	<< SPBRGH:SPBRG	= 12
+000074   1303     bcf	0x3, 0x6             
+000075   1518     bsf	0x18, 0x2            	bsf		TXSTA,2		;;	<< BR           = 19200
+000076   1218     bcf	0x18, 0x4            	bcf		TXSTA,4		;;	<< ACTBR        = 19.23 k
+000077   1198     bcf	0x18, 0x3            	bcf		TXSTA,3		;;	<< ERROR        = 0.16 %
+000078   1698     bsf	0x18, 0x5            	bsf		TXSTA,5		;;	<<
+000079   1318     bcf	0x18, 0x6            	bcf		TXSTA,6		;;	<<
+00007a   1283     bcf	0x3, 0x5             	banksel		RCSTA		;;	<<
+00007b   1303     bcf	0x3, 0x6             
+00007c   1198     bcf	0x18, 0x3            	bcf		RCSTA,3		;;	<<
+00007d   1618     bsf	0x18, 0x4            	bsf		RCSTA,4		;;	<<
+00007e   1318     bcf	0x18, 0x6            	bcf		RCSTA,6		;;	<<
+00007f   1798     bsf	0x18, 0x7            	bsf		RCSTA,7		;;	<<
+000080   0008     return                   	return
                                            	end

@@ -20,6 +20,6 @@ X		pop_sipo_w.asm
 X	loopback_piso.asm
 X		push_w_piso.asm
 X		pop_piso_w.asm
-#	sipo.asm & piso.asm & loopback_sipo.asm & loopback_piso.asm
+#	sipo.asm & piso.asm & loopback_sipo.asm & loopback_piso.asm & greet.asm
 X		mv_w_tx.asm
 X		mv_rx_w.asm

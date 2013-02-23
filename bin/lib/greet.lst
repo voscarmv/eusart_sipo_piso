@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-21-2013  13:16:57          PAGE  1
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -10,42 +10,185 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                00002 ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
                00607         LIST
                00003 
-               00004         extern          mv_w_tx
-               00005         extern          mv_rx_w
-               00006         extern          mv_piso_w
-               00007         extern          load_piso
-               00008         extern          clear_piso
-               00009 
-               00010         global          piso
-               00011 
-               00012         udata
-               00013 COUNT   res             1
-               00014 
-               00015 libsp   code
-0000 00016 piso:
-0000 3002      00017         movlw           .2              ;;      << Prompt
-0001 2000      00018         call            mv_w_tx
-               00019         .direct         "c","Control.rx"
-               00020         .direct         "c","Control.tx = 0x02"
-0002 2000      00021         call            mv_rx_w
-0003 0080      00022         movwf           COUNT
-0004 3A00      00023         xorlw           .0
-0005 1903      00024         skpnz
-0006 2800      00025         goto            finish
-0007 2000      00026         call            clear_piso
-0008 2000      00027         call            load_piso
-0009 00028 ser_in:
-0009 2000      00029         call            mv_piso_w
-000A 2000      00030         call            mv_w_tx
-               00031         .direct         "c","Control.rx"
-000B 0000 0000 00032         banksel         COUNT
-000D 0B80      00033         decfsz          COUNT,1
-               00034         .direct         "c","Control.rx"
-000E 2800      00035         goto            ser_in
-000F 2800      00036         goto            piso
-0010 00037 finish:
-0010 0008      00038         return
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-21-2013  13:16:57          PAGE  2
+               00004         extern          mv_rx_w
+               00005         extern          mv_w_tx
+               00006 
+               00007         global          greet
+               00008 
+               00009         udata
+               00010 FLAGS   res             1
+               00011 GSIG    res             1
+               00012 
+               00013 libsp   code
+0000 00014 greet:
+               00015 ;;      Signals:
+               00016 ;;      Byte    Signal                  Function
+               00017 ;;      .7      Interface-distress      Send to Control, expect Control-response
+               00018 ;;      .8      Control-response        Send to Interface after receiving Interface-distress
+               00019 ;;                                      and expect Interface-confirm
+               00020 ;;      .9      Interface-confirm       Send to Control after receiving Control-response
+               00021 ;;      .10     Control-distress        Send to Interface, expect Interface-response
+               00022 ;;      .11     Interface-response      Send to Control after receiving Control-distress
+               00023 ;;                                      and expect Control-confirm
+               00024 ;;      .12     Control-confirm         Send to Interface after receiving Interface-response
+               00025 
+               00026 ;;      Flags:
+               00027 ;;      (All flags are set by default)
+               00028 ;;      Bit     Flag                    Function
+               00029 ;;      0       C_DISTRESS_PENDING      Interface is expecting Control-distress.
+               00030 ;;                                      Therefor: C_DISTRESS_PENDING = 1
+               00031 ;;                                      When Control-distress is received, this is unset.
+               00032 ;;      1       C_RESPONSE_PENDING      Interface-distress was sent AND received by Control,
+               00033 ;;                                      Interface is now expecting a Control-response signal
+               00034 ;;                                      Therefor: C_RESPONSE_PENDING = 1
+               00035 ;;                                      When Control-response is received, this is unset.
+               00036 ;;      2       C_CONFIRM_PENDING       Control-distress was received and responded by
+               00037 ;;                                      Interface with an Interface-response. Interface
+               00038 ;;                                      is therefor expecting a Control-confirm.
+               00039 ;;                                      Therefor: C_CONFIRM_PENDING = 1
+               00040 ;;                                      When Control-confirm is received, this is unset.
+               00041 ;;      3       ITX_IRX                 Interface-distress was sent and Control-response
+               00042 ;;                                      was received in exchange. Interface-confirm will be
+               00043 ;;                                      sent to Control.
+               00044 ;;                                      Therefor: ITX_IRX = 0
+               00045 ;;                                      Otherwise, this is set.
+               00046 ;;      4       CTX_CRX                 Control-distress was received and responded with
+               00047 ;;                                      Interface-response by Interface. Then, Control
+               00048 ;;                                      sent Control-confirm and Interface received this.
+               00049 ;;                                      Therefor: CTX_CRX = 0
+               00050 ;;                                      Otherwise, this is set.
+               00051 
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00052 ;;      It can be said that ITX_IRX=0 only when C_RESPONSE_PENDING is 0, and
+               00053 ;;      CTX_CRX=0 only when C_DISTRESS_PENDING = C_CONFIRM_PENDING = 0
+               00054 
+               00055 ;;      Set flags
+0000 0000 0000 00056         banksel         FLAGS
+0002 301F      00057         movlw           B'00011111'
+0003 0000 0000 00058         banksel         FLAGS
+0005 0080      00059         movwf           FLAGS
+               00060 
+               00061 ;;      Break loop
+0006 00062 break:
+0006 0000 0000 00063         banksel         FLAGS
+0008 0800      00064         movfw           FLAGS
+0009 3A00      00065         xorlw           .0
+000A 1903      00066         skpnz
+000B 2800      00067         goto            finish
+               00068 
+               00069 ;;      Transmission
+000C 00070 transmit:
+000C 0000 0000 00071         banksel         FLAGS
+000E 1C80      00072         btfss           FLAGS,1
+000F 2800      00073         goto            else1
+               00074 ;;
+               00075 ;;      if C_RESPONSE_PENDING (FLAGS,1) == 1 ; then
+               00076 ;;
+0010 3007      00077         movlw           .7              ;;      << Send Interface-distress
+0011 2000      00078         call            mv_w_tx
+               00079         .direct         "c","Control.rx"
+0012 2800      00080         goto            fi1
+               00081 ;;
+               00082 ;;      else
+               00083 ;;
+0013 00084 else1:
+0013 3009      00085         movlw           .9              ;;      << Send Interface-confirm
+0014 2000      00086         call            mv_w_tx
+               00087         .direct         "c","Control.rx"
+               00088 ;;
+               00089 ;;      fi
+               00090 ;;
+0015 00091 fi1:
+               00092 
+0015 0000 0000 00093         banksel         FLAGS
+0017 0800      00094         movfw           FLAGS
+0018 3905      00095         andlw           B'00000101'
+0019 3A04      00096         xorlw           B'00000100'
+001A 1D03      00097         skpz
+001B 2800      00098         goto            fi2
+               00099 ;;
+               00100 ;;      if C_DISTRESS_PENDING (FLAGS,0) == 0 && C_CONFIRM_PENDING (FLAGS,2) == 1 ; then
+               00101 ;;
+001C 300B      00102         movlw           .11             ;;      << Send Interface-response
+001D 2000      00103         call            mv_w_tx
+               00104         .direct         "c","Control.rx"
+               00105 ;;
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00106 ;;      fi
+               00107 ;;
+001E 00108 fi2:
+               00109 
+               00110 ;;      Sample RX byte
+001E 00111 sample:
+               00112         .direct         "c","Control.tx=8"
+001E 1283 1303 00113         banksel         PIR1
+0020 1E8C      00114         btfss           PIR1,5
+0021 2800      00115         goto            break
+               00116 
+               00117 ;;      Reception
+0022 00118 receive:
+0022 2000      00119         call            mv_rx_w
+0023 0000 0000 00120         banksel         GSIG
+0025 0080      00121         movwf           GSIG
+0026 3A0A      00122         xorlw           .10
+0027 1903      00123         skpnz
+               00124 ;;
+               00125 ;;      if SIGNAL == Control-distress ; then
+               00126 ;;
+               00127         .direct         "c","Control.tx"
+0028 1000      00128         bcf             FLAGS,0         ;;      << Clear C_DISTRESS_PENDING
+               00129 ;;
+               00130 ;;      fi
+               00131 ;;
+               00132 
+0029 0800      00133         movfw           GSIG
+002A 3A08      00134         xorlw           .8
+002B 1D03      00135         skpz
+002C 2800      00136         goto            fi3
+               00137 ;;
+               00138 ;;      if SIGNAL == Control-response ; then
+               00139 ;;
+002D 1080      00140         bcf             FLAGS,1         ;;      << Clear C_RESPONSE_PENDING
+002E 1180      00141         bcf             FLAGS,3         ;;      << Clear ITX_IRX
+               00142 ;;
+               00143 ;;      fi
+               00144 ;;
+002F 00145 fi3:
+               00146 
+002F 0800      00147         movfw           GSIG
+0030 3A0C      00148         xorlw           .12
+0031 1D03      00149         skpz
+0032 2800      00150         goto            fi4
+               00151 ;;
+               00152 ;;      if SIGNAL == Control-confirm ; then
+               00153 ;;
+0033 1100      00154         bcf             FLAGS,2         ;;      << Clear C_CONFIRM_PENDING
+0034 1200      00155         bcf             FLAGS,4         ;;      << Clear CTX_CRX
+               00156 ;;
+               00157 ;;      fi
+               00158 ;;
+0035 00159 fi4:
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00160 
+0035 2800      00161         goto            break
+0036 00162 finish:
+0036 0008      00163         return
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  5
 
 
 SYMBOL TABLE
@@ -104,7 +247,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-21-2013  13:16:57          PAGE  3
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -147,7 +290,6 @@ CKP                               00000004
 CM1CON0                           00000119
 CM2CON0                           0000011A
 CM2CON1                           0000011B
-COUNT                             00000000
 CREN                              00000004
 CSRC                              00000007
 D                                 00000005
@@ -164,13 +306,13 @@ ECCPASE                           00000007
 EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-21-2013  13:16:57          PAGE  4
+EECON2                            0000018D
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
-EECON2                            0000018D
 EEDAT                             0000010C
 EEDATA                            0000010C
 EEDATH                            0000010E
@@ -179,10 +321,12 @@ EEIF                              00000004
 EEPGD                             00000007
 F                                 00000001
 FERR                              00000002
+FLAGS                             00000000
 FSR                               00000004
 GIE                               00000007
 GO                                00000001
 GO_DONE                           00000001
+GSIG                              00000001
 HTS                               00000002
 I2C_DATA                          00000005
 I2C_READ                          00000002
@@ -223,13 +367,13 @@ MSK                               00000093
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
-NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-21-2013  13:16:57          PAGE  5
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+NOT_DONE                          00000001
 NOT_PD                            00000003
 NOT_POR                           00000001
 NOT_RABPU                         00000007
@@ -283,13 +427,13 @@ R                                 00000002
 RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
-RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-21-2013  13:16:57          PAGE  6
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+RCIE                              00000005
 RCIF                              00000005
 RCREG                             0000001A
 RCSTA                             00000018
@@ -343,13 +487,13 @@ T1CKPS1                           00000005
 T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
-T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-21-2013  13:16:57          PAGE  7
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+T1IE                              00000000
 T1IF                              00000000
 T1OSCEN                           00000003
 T2CKPS0                           00000000
@@ -403,13 +547,13 @@ TUN4                              00000004
 TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
-TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-21-2013  13:16:57          PAGE  8
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+TXIE                              00000004
 TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
@@ -463,13 +607,13 @@ _EXTRC_OSC_NOCLKOUT               00003FFE
 _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
-_IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/piso.asm2-21-2013  13:16:57          PAGE  9
+gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE 12
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+_IESO_OFF                         00003BFF
 _IESO_ON                          00003FFF
 _INTOSC                           00003FFD
 _INTOSCIO                         00003FFC
@@ -484,14 +628,19 @@ _WDT_OFF                          00003FF7
 _WDT_ON                           00003FFF
 _XT_OSC                           00003FF9
 __16F690                          00000001
-clear_piso                        00000000
-finish                            00000010
-load_piso                         00000000
-mv_piso_w                         00000000
+break                             00000006
+else1                             00000013
+fi1                               00000015
+fi2                               0000001E
+fi3                               0000002F
+fi4                               00000035
+finish                            00000036
+greet                             00000000
 mv_rx_w                           00000000
 mv_w_tx                           00000000
-piso                              00000000
-ser_in                            00000009
+receive                           00000022
+sample                            0000001E
+transmit                          0000000C
 
 
 Errors   :       0

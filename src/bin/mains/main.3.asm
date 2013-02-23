@@ -5,7 +5,6 @@
 	include		<signals.inc>
 
 	extern		set_ports
-	extern		greet
 	extern		mv_rx_w
 	extern		mv_w_tx
 	extern		sipo
@@ -19,7 +18,6 @@ start	code		H'0000'
 
 prog	code
 main:
-	call		greet
 aa:
 	goto		aa
 	end

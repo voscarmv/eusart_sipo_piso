@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  1
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-21-2013  10:01:54          PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -13,10 +13,10 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                00004         global          loopback_piso
                00005 
                00006         extern          clear_piso
-               00007 
+               00007 ;;
                00008 ;;      Remove following after test
-               00009         extern          load_piso
-               00010 
+               00009 ;;      extern          load_piso
+               00010 ;;
                00011         extern          mv_w_tx
                00012         extern          mv_rx_w
                00013         extern          push_w_piso
@@ -40,22 +40,23 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                00031 ;;      The following instruction simulates the clear_piso
                00032 ;;      function for the ttl165 model of gpsim, but must
                00033 ;;      be removed upon test completion:
-0008 2000      00034         call            load_piso
-0009 00035 push:
-0009 3004      00036         movlw           .4              ;;      << Prompt
-000A 2000      00037         call            mv_w_tx
+               00034 ;;      call            load_piso
+0008 00035 push:
+0008 3004      00036         movlw           .4              ;;      << Prompt
+0009 2000      00037         call            mv_w_tx
                00038         .direct         "c","Control.rx"
                00039         .direct         "c","Control.tx = 0xF7"
-000B 2000      00040         call            mv_rx_w
-000C 2000      00041         call            push_w_piso
-000D 2000      00042         call            pop_piso_w
-000E 2000      00043         call            mv_w_tx
-000F 0000 0000 00044         banksel         COUNT
-0011 0B80      00045         decfsz          COUNT,1
-0012 2800      00046         goto            push
-0013 00047 finish:
-0013 0008      00048         return
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  2
+000A 2000      00040         call            mv_rx_w
+000B 2000      00041         call            push_w_piso
+000C 2000      00042         call            pop_piso_w
+000D 2000      00043         call            mv_w_tx
+000E 0000 0000 00044         banksel         COUNT
+0010 0B80      00045         decfsz          COUNT,1
+0011 2800      00046         goto            push
+0012 2800      00047         goto            loopback_piso
+0013 00048 finish:
+0013 0008      00049         return
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-21-2013  10:01:54          PAGE  2
 
 
 SYMBOL TABLE
@@ -114,7 +115,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  3
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-21-2013  10:01:54          PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -174,7 +175,7 @@ ECCPASE                           00000007
 EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  4
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-21-2013  10:01:54          PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -234,7 +235,7 @@ NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  5
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-21-2013  10:01:54          PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -294,7 +295,7 @@ RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  6
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-21-2013  10:01:54          PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -354,7 +355,7 @@ T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  7
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-21-2013  10:01:54          PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -414,7 +415,7 @@ TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  8
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-21-2013  10:01:54          PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -474,7 +475,7 @@ _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-19-2013  18:55:54          PAGE  9
+gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm2-21-2013  10:01:54          PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -496,12 +497,11 @@ _XT_OSC                           00003FF9
 __16F690                          00000001
 clear_piso                        00000000
 finish                            00000013
-load_piso                         00000000
 loopback_piso                     00000000
 mv_rx_w                           00000000
 mv_w_tx                           00000000
 pop_piso_w                        00000000
-push                              00000009
+push                              00000008
 push_w_piso                       00000000
 
 

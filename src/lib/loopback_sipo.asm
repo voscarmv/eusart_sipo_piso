@@ -36,7 +36,7 @@ push:
 	banksel		COUNT
 	decfsz		COUNT,1
 	goto		push
-;;	goto		loopback_sipo
+	goto		loopback_sipo
 finish:
 	return
 	end

@@ -589,3 +589,181 @@ Right now, piso.asm and sipo.asm do not behave as they should. Remember to
 and
 	goto		piso
 after finishing loops, to check for 0x00 loop-breaking signal from Control.
+Wed Feb 20 09:56:44 CST 2013
+When writing to or reading from an udata register, there is a problem with the location
+in which they are stored in memory. General Purpose Register is spread throughout 3 banks.
+So, there is no way of bein absolutely sure that a 1 byte register will be stored in
+one or another. This implies that banksel must be used before any w/r to/from a register
+administrated by udata. In some cases this complicates the code too much, e.g.:
+	banksel		PORTA
+	btfsc		PORTA,0
+	bsf		REGIS,3
+woudl have to be re-written as:
+	banksel		PORTA
+	btfsc		PORTA,0
+	goto		func
+func_end:
+	...
+func:
+	banksel		REGIS
+	bsf		REGIS,3
+	goto		func_end
+So, it is relatively safe to assume that a ONE BYTE register REGIS will be in bank 1, which
+is the same bank as PORTA/B/C. So perhaps it is convenient to just leave it like that.
+Another option is to create a subroutine in a separete file:
+	btfsc		PORTA,0
+	call		clear_regis_3
+Except that in examples where the bit argument is a macro variable, that gets much more
+complicated:
+;; FILE 1:
+	...
+	global		BIT
+	...
+i=8
+	movlw		i-1
+	movwf		BIT
+	while		i > 0
+	btfsc		PORTA,0
+	call		clear_regis_w
+i -= 1
+	endw
+;; FILE 2:
+	...
+	extern		BIT
+	...
+	banksel		REGIS
+	movfw		BIT
+	xorlw		.0
+	skpnz
+	bsf		REGIS,0
+	movfw		BIT
+	xorlw		.1
+	skpnz
+	bsf		REGIS,1
+	movfw		BIT
+	xorlw		.2
+	skpnz
+	bsf		REGIS,1
+	...
+But ofcourse, that ends up sucking too...
+Given that I am using but a few GPR regs, and a specific PIC, this is not a big issue,
+so I will just trust that all GPRs are in bank 1. But be warned that this may not be the
+case always.
+Wed Feb 20 13:41:03 CST 2013
+There is a problem with greetloop: Interface's buffer is 1 bit long. If a Control-response
+or Control-confirm signal is sent to Interface while it's buffer is full, it will be lost.
+Therefor: Control must send these repetitively, until the proper flags are cleared
+in control's side. Perhaps the same should apply to how Interface sends them to Control,
+although maybe not, because Control's buffer is much longer, and everything may get
+recorded in it, even if it's just a one-time signal coming from Interface.
+Wed Feb 20 17:00:34 CST 2013
+It is also possible for either side to receive the same signal more than once. If this
+happens, the signal should not be processed. Just ignore repeated signals.
+Some signals required being re-sent. Signals which require some response from the other
+side may not have been responded after the first run through the case statement which
+checks for the type of the received signal. The PENDING flags help solve this. For each
+set PENDING flag, the greeting algorythm should send (and re-send) the signal requiring
+the specific response. E.g.:
+	if C_DISTRESS_PENDING = 1 ; then
+		There is no particular action for this.
+	fi
+	if C_RESPONSE_PENDING = 1 ; then
+		Send Interface-distress to Control
+	fi
+	if C_CONFIRM_PENDING = 1 && C_DISTRESS_PENDING = 0 ; then
+		Send Interface-response to Control
+	fi
+And so, the algorithm from Interface's perspective, should be something like:
+;;	Signal-sending:
+	if C_RESPONSE_PENDING = 1 ; then
+		Send Interface-distress
+	fi
+	if C_CONFIRM_PENDING = 1 && C_DISTRESS_PENDING = 0 ; then
+		Send Interface-response
+	fi
+;;	Signal-receiving:
+	if SIGNAL = Control-response & C_RESPONSE_PENDING = 1 ; then
+		Clear C_RESPONSE_PENDING
+		Clear ITX_IRX
+		Send Interface-confirm
+	fi
+	if SIGNAL = Control-distress & C_DISTRESS_PENDING = 1 ; then
+		Clear C_DISTRESS_PENDING
+		Send Interface-response
+	fi
+	if SIGNAL = Control-confirm & C_CONFIRM_PENDING = 1 ; then
+		Clear C_CONFIRM_PENDING
+		Clear CTX_CRX
+	fi
+;;	Loop-breaking:
+	if ITX_IRX = 0 && CTX_CRX = 0 ; then
+		Break
+	else
+		Return to Signal-sending
+	fi
+It doesn't matter much to Control that Interface-confirm is sent only once. But it might
+matter for Interface that Control sends Control-confirm only once, without checking if
+it was caught by Interface. This is so because Interface's input buffer is but one byte
+long, and greeting signals coming from Control may get lost.
+ What Interface does right after receiving Control-confirm (having already sent
+Interface-confirm) is to send Control the first "Prompt" byte. This is a nice way for
+Control to know when, and if, Interface has received Control-confirm. In other words:
+Control should check for the "Prompt byte"; if it is not there yet, then keep sending
+Control-confirm (given that Interface-distress has been responded by Control-response
+already, obviously).
+Fri Feb 22 16:00:30 CST 2013
+Signal-sending should send signals depending on the value of the FLAG byte. Signal-
+reception should only alter the value of FLAG. It sould to something like...
+	1. Assign initial value to FLAG
+	2. Loop start: check if FLAG == 0. If so, go to 6.
+	3. Send signals depending on FLAG value.
+	4. If RX byte is present, continue. Else, go back to 2.
+	5. Change FLAG value according to RX byte. Go back to 2.
+	6. Finish greet.
+Fri Feb 22 23:19:27 CST 2013
+The loop could go like this:
+;;	Transmission
+	if C_RESPONSE_PENDING == 1 ; then
+		send	Interface-distress
+	else
+		send	Interface-confirm
+	fi
+	if C_CONFIRM_PENDING == 1 && C_DISTRESS_PENDING == 0 ; then
+		send	Interface-response
+	fi
+;;	Sample TX byte
+	if "There is a byte in RXREG" ; then
+		goto	reception
+	else
+		goto	transmission
+	fi
+;;	Reception:
+	if SIGNAL == Control-distress ; then
+		clear	C_DISTRESS_PENDING
+	fi
+	if SIGNAL == Control-response ; then
+		clear	C_RESPONSE_PENDING
+		clear	ITX_IRX
+	fi
+	if SIGNAL == Control-confirm ; then
+		clear	C_CONFIRM_PENDING
+		clear	CTX_CRX
+	fi
+;;	Break loop
+	if FLAGS<0:7> == 0x00 ; then
+		goto	finish
+	else
+		foto	transmit
+	fi
+Consider handling unknown signals with an error response signal: Interface-error or
+Control-error. Also: use skipping method with btfsc/btfss/xorlw+skpnz for if statements:
+	btfsc		FLAGS,2
+	goto		skip1
+	movlw		.7
+	call		mv_w_tx
+skip1:
+	btfsc		FLAGS,3
+	goto		skip2
+	...
+skip2:
+	...
