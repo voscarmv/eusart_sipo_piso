@@ -767,3 +767,25 @@ skip1:
 	...
 skip2:
 	...
+Sat Feb 23 22:40:02 CST 2013
+Two things worry me:
+	1. Control's input buffer may get overloaded because Interface continuously sends
+		Interface-distress, even though Control isn't interpreting signals at
+		the moment Interface sends that.
+		Therefor, it is necessary for Control to flush /dev/ttyUSB0 before
+		greeting Interface. How to do this? Since
+			cat /dev/ttyUSB0
+		does not finish, until something like ^C happens. Perhaps
+			cat /dev/ttyUSB0 &
+			kill ${!}
+			wait ${!}
+		or maybe killing the reader will do:
+			mkfifo SOMEFIFO
+			cat /dev/ttyUSB0 | while od ; do cat SOMEFIFO ; done &
+			printf '1' > SOMEFIFO
+	2. Let's say that Interface is sampling the RX byte, and Control sends some
+		repetitive sequence of bytes, like, .8, .10, .8, ...; and Interface
+		for some reason only receives the .8 byte, because the other one comes
+		at a time when mv_rx_w is not executed. Well: this is an unlikely scenario
+		because, Control sends only one signal repeatedly at a time. Nah...
+		this doesn't really seem like a problem.
