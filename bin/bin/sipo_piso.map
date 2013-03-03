@@ -1,54 +1,114 @@
 gplink-0.13.7 beta
-Map File - Created 2-24-2013  01:00:24
+Map File - Created 3-2-2013  19:43:39
  
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
                 ---------  ---------  ---------  ---------  ---------
                     start       code   00000000    program   0x000004
-                    libsp       code   0x000002    program   0x0000fe
-                     prog       code   0x000081    program   0x000004
+                    libsp       code   0x000002    program   0x000432
+                     prog       code   0x00021b    program   0x00005c
                   .config       code   0x002007    program   0x000002
-                   .udata      udata   0x000020       data   0x000002
+                   .udata      udata   0x000020       data   0x00000f
  
                               Program Memory Usage
                                Start         End
                            ---------   ---------
                             0x002007    0x002007
                             00000000    0x000001
-                            0x000081    0x000082
-                            0x000002    0x000080
+                            0x00021b    0x000248
+                            0x000002    0x00021a
  
-                            132 program addresses used
+                            586 program addresses used
  
                               Symbols
                      Name    Address   Location    Storage File
                 ---------  ---------  ---------  --------- ---------
-                     main   0x000081    program     static src/bin/main_sipo_piso.asm
-                       aa   0x000082    program     static src/bin/main_sipo_piso.asm
-                    FLAGS   0x000020       data     static ./src/lib/greet.asm
-                     GSIG   0x000021       data     static ./src/lib/greet.asm
+                      SIG   0x000020       data     static src/bin/main_sipo_piso.asm
+                     main   0x00021b    program     static src/bin/main_sipo_piso.asm
+                 prompt13   0x00021c    program     static src/bin/main_sipo_piso.asm
+                      fi1   0x000227    program     static src/bin/main_sipo_piso.asm
+                      fi2   0x00022f    program     static src/bin/main_sipo_piso.asm
+                      fi3   0x000237    program     static src/bin/main_sipo_piso.asm
+                      fi4   0x00023f    program     static src/bin/main_sipo_piso.asm
+                       aa   0x000248    program     static src/bin/main_sipo_piso.asm
+                    FLAGS   0x000021       data     static ./src/lib/greet.asm
+                     GSIG   0x000022       data     static ./src/lib/greet.asm
                     greet   0x000002    program     extern ./src/lib/greet.asm
                     break   0x000008    program     static ./src/lib/greet.asm
                  transmit   0x00000e    program     static ./src/lib/greet.asm
-                  .direct   0x000014    program     static ./src/lib/greet.asm
-                    else1   0x000015    program     static ./src/lib/greet.asm
-                  .direct   0x000017    program     static ./src/lib/greet.asm
-                      fi1   0x000017    program     static ./src/lib/greet.asm
-                  .direct   0x000020    program     static ./src/lib/greet.asm
-                      fi2   0x000020    program     static ./src/lib/greet.asm
-                   sample   0x000020    program     static ./src/lib/greet.asm
-                  .direct   0x000020    program     static ./src/lib/greet.asm
-                  receive   0x000024    program     static ./src/lib/greet.asm
-                  .direct   0x00002a    program     static ./src/lib/greet.asm
-                      fi3   0x000031    program     static ./src/lib/greet.asm
-                      fi4   0x000037    program     static ./src/lib/greet.asm
-                   finish   0x000038    program     static ./src/lib/greet.asm
-                set_ports   0x000039    program     extern ./src/lib/set_ports.asm
-          set_pinout_tris   0x00003d    program     extern ./src/lib/set_pinout_tris.asm
-                  mv_rx_w   0x00004b    program     extern ./src/lib/mv_rx_w.asm
-            _libsp_000003   0x00004e    program     static ./src/lib/mv_rx_w.asm
-                  mv_w_tx   0x000053    program     extern ./src/lib/mv_w_tx.asm
-            _libsp_000006   0x000059    program     static ./src/lib/mv_w_tx.asm
-         set_anselh_ansel   0x00005b    program     extern ./src/lib/set_anselh_ansel.asm
-         set_eusart_19200   0x000062    program     extern ./src/lib/set_eusart_19200.asm
+                  .direct   0x000015    program     static ./src/lib/greet.asm
+                    else1   0x000016    program     static ./src/lib/greet.asm
+                  .direct   0x000019    program     static ./src/lib/greet.asm
+                      fi1   0x000019    program     static ./src/lib/greet.asm
+                  .direct   0x000023    program     static ./src/lib/greet.asm
+                      fi2   0x000023    program     static ./src/lib/greet.asm
+                   sample   0x000023    program     static ./src/lib/greet.asm
+                  .direct   0x000023    program     static ./src/lib/greet.asm
+                  receive   0x000027    program     static ./src/lib/greet.asm
+                  .direct   0x00002d    program     static ./src/lib/greet.asm
+                      fi3   0x000034    program     static ./src/lib/greet.asm
+                      fi4   0x00003a    program     static ./src/lib/greet.asm
+                   finish   0x00003b    program     static ./src/lib/greet.asm
+                    COUNT   0x000023       data     static ./src/lib/sipo.asm
+                     sipo   0x00003c    program     extern ./src/lib/sipo.asm
+                  .direct   0x00003e    program     static ./src/lib/sipo.asm
+                  .direct   0x00003e    program     static ./src/lib/sipo.asm
+                  ser_out   0x000044    program     static ./src/lib/sipo.asm
+                  .direct   0x000046    program     static ./src/lib/sipo.asm
+                  .direct   0x000046    program     static ./src/lib/sipo.asm
+                   finish   0x00004c    program     static ./src/lib/sipo.asm
+                     CTR1   0x000024       data     static ./src/lib/delay.asm
+                     CTR2   0x000025       data     static ./src/lib/delay.asm
+                    delay   0x00004d    program     extern ./src/lib/delay.asm
+                    loop1   0x000053    program     static ./src/lib/delay.asm
+                    loop2   0x000056    program     static ./src/lib/delay.asm
+                   finish   0x000059    program     static ./src/lib/delay.asm
+                set_ports   0x00005a    program     extern ./src/lib/set_ports.asm
+          set_pinout_tris   0x00005e    program     extern ./src/lib/set_pinout_tris.asm
+                  mv_rx_w   0x00006c    program     extern ./src/lib/mv_rx_w.asm
+            _libsp_000003   0x00006f    program     static ./src/lib/mv_rx_w.asm
+                    COUNT   0x000026       data     static ./src/lib/loopback_piso.asm
+            loopback_piso   0x000074    program     extern ./src/lib/loopback_piso.asm
+                  .direct   0x000076    program     static ./src/lib/loopback_piso.asm
+                  .direct   0x000076    program     static ./src/lib/loopback_piso.asm
+                     push   0x00007d    program     static ./src/lib/loopback_piso.asm
+                  .direct   0x00007f    program     static ./src/lib/loopback_piso.asm
+                  .direct   0x00007f    program     static ./src/lib/loopback_piso.asm
+                   finish   0x000088    program     static ./src/lib/loopback_piso.asm
+                    COUNT   0x000027       data     static ./src/lib/piso.asm
+                     piso   0x000089    program     extern ./src/lib/piso.asm
+                  .direct   0x00008b    program     static ./src/lib/piso.asm
+                  .direct   0x00008b    program     static ./src/lib/piso.asm
+                   ser_in   0x000092    program     static ./src/lib/piso.asm
+                  .direct   0x000094    program     static ./src/lib/piso.asm
+                  .direct   0x000097    program     static ./src/lib/piso.asm
+                   finish   0x000099    program     static ./src/lib/piso.asm
+                   TOSIPO   0x000028       data     static ./src/lib/mv_w_sipo.asm
+                mv_w_sipo   0x00009a    program     extern ./src/lib/mv_w_sipo.asm
+                   FRPISO   0x000029       data     static ./src/lib/mv_piso_w.asm
+                mv_piso_w   0x0000d0    program     extern ./src/lib/mv_piso_w.asm
+                   TOPISO   0x00002a       data     static ./src/lib/push_w_piso.asm
+                   FRPISO   0x00002b       data     extern ./src/lib/push_w_piso.asm
+              push_w_piso   0x000106    program     extern ./src/lib/push_w_piso.asm
+                  mv_w_tx   0x00015e    program     extern ./src/lib/mv_w_tx.asm
+            _libsp_000006   0x000164    program     static ./src/lib/mv_w_tx.asm
+         set_anselh_ansel   0x000166    program     extern ./src/lib/set_anselh_ansel.asm
+               clear_piso   0x00016d    program     extern ./src/lib/clear_piso.asm
+                load_piso   0x000173    program     extern ./src/lib/load_piso.asm
+         set_eusart_19200   0x00017c    program     extern ./src/lib/set_eusart_19200.asm
+               pop_piso_w   0x00019b    program     extern ./src/lib/pop_piso_w.asm
+                    COUNT   0x00002c       data     static ./src/lib/loopback_sipo.asm
+            loopback_sipo   0x00019f    program     extern ./src/lib/loopback_sipo.asm
+                  .direct   0x0001a1    program     static ./src/lib/loopback_sipo.asm
+                  .direct   0x0001a1    program     static ./src/lib/loopback_sipo.asm
+                     push   0x0001a7    program     static ./src/lib/loopback_sipo.asm
+                  .direct   0x0001a9    program     static ./src/lib/loopback_sipo.asm
+                  .direct   0x0001a9    program     static ./src/lib/loopback_sipo.asm
+                   finish   0x0001b2    program     static ./src/lib/loopback_sipo.asm
+                   TOSIPO   0x00002d       data     static ./src/lib/push_w_sipo.asm
+                   FRSIPO   0x00002e       data     extern ./src/lib/push_w_sipo.asm
+              push_w_sipo   0x0001b3    program     extern ./src/lib/push_w_sipo.asm
+               clear_sipo   0x00020b    program     extern ./src/lib/clear_sipo.asm
+                load_sipo   0x000211    program     extern ./src/lib/load_sipo.asm
+               pop_sipo_w   0x000217    program     extern ./src/lib/pop_sipo_w.asm
  

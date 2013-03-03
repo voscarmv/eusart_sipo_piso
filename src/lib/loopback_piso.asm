@@ -3,6 +3,7 @@
 
 	global		loopback_piso
 
+	extern		load_piso
 	extern		clear_piso
 ;;
 ;;	Remove following after test
@@ -27,6 +28,7 @@ loopback_piso:
 	xorlw		.0
 	skpnz
 	goto		finish
+	call		load_piso
 	call		clear_piso
 ;;	The following instruction simulates the clear_piso
 ;;	function for the ttl165 model of gpsim, but must

@@ -3,6 +3,7 @@
 
 	extern		mv_rx_w
 	extern		mv_w_tx
+	extern		delay
 
 	global		greet
 
@@ -74,6 +75,7 @@ transmit:
 ;;
 ;;	if C_RESPONSE_PENDING (FLAGS,1) == 1 ; then
 ;;
+	call		delay
 	movlw		.7		;;	<< Send Interface-distress
 	call		mv_w_tx
 	.direct		"c","Control.rx"
@@ -82,6 +84,7 @@ transmit:
 ;;	else
 ;;
 else1:
+	call		delay
 	movlw		.9		;;	<< Send Interface-confirm
 	call		mv_w_tx
 	.direct		"c","Control.rx"
@@ -99,6 +102,7 @@ fi1:
 ;;
 ;;	if C_DISTRESS_PENDING (FLAGS,0) == 0 && C_CONFIRM_PENDING (FLAGS,2) == 1 ; then
 ;;
+	call		delay
 	movlw		.11		;;	<< Send Interface-response
 	call		mv_w_tx
 	.direct		"c","Control.rx"

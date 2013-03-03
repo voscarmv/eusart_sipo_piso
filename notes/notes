@@ -789,3 +789,21 @@ Two things worry me:
 		at a time when mv_rx_w is not executed. Well: this is an unlikely scenario
 		because, Control sends only one signal repeatedly at a time. Nah...
 		this doesn't really seem like a problem.
+Tue Feb 26 20:19:52 CST 2013
+Worry 1 is unfounded. Apparently, any byte sent into the PL2303HX RX terminal is lost
+unless there is a process reading /dev/ttyUSB0, such as cat /dev/ttyUSB0.
+...Fortunately!
+I found this out as I connected the PL2303HX in loopback mode (TX connected to RX) and
+sent bytes with
+	printf '\xff' > /dev/ttyUSB0
+without first doing
+	stty -F/dev/ttyUSB0 raw 19200 -echo
+	cat /dev/ttyUSB0 | od -tx1 -w1 -v
+in another terminal.
+What happened was that, no matter how much I prntfed bytes into /dev/ttyUSB, they would
+not appear when I catted ttyUSB0. Only if I was catting it before printfing, did they
+appear.
+Sat Mar  2 20:38:16 CST 2013
+Apparently, executing greet without a delay before each mv_w_tx, causes
+	cat /dev/ttyUSB0 | od -Ad -tx1 -w1 -v
+to show invalid output. So a tiny delay had to be implemented there.

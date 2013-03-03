@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  1
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -9,11 +9,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                00001         LIST
                00002 ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
                00607         LIST
-               00003         include         <coff.inc>
-               00001   list
-               00002 ; coff.inc - gputils header file
-               00139   list
-               00004         include         <config.inc>
+               00003         include         <config.inc>
                00001 ;; gputils_make_example, Copyright 2013 Vicente Oscar Mier Vela <vomv1988@gmail.com>
                00002 ;;    This file is part of gputils_make_example.
                00003 ;;
@@ -30,66 +26,201 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                00014 ;;    You should have received a copy of the GNU General Public License
                00015 ;;    along with gputils_make_example.  If not, see <http://www.gnu.org/licenses/>.
 002007 0000    00016         __CONFIG ( _FCMEN_OFF & _IESO_OFF & _BOR_OFF & _CPD_OFF & _CP_OFF & _MCLRE_OFF & _PWRTE_OFF & _WDT_OFF & _INTRC_OSC_NOCLKOUT )
-               00005         include         <signals.inc>
-               00001 ;; gputils_make_example, Copyright 2013 Vicente Oscar Mier Vela <vomv1988@gmail.com>
-               00002 ;;    This file is part of gputils_make_example.
-               00003 ;;
-               00004 ;;    gputils_make_example is free software: you can redistribute it and/or modify
-               00005 ;;    it under the terms of the GNU General Public License as published by
-               00006 ;;    the Free Software Foundation, either version 3 of the License, or
-               00007 ;;    (at your option) any later version.
-               00008 ;;
-               00009 ;;    gputils_make_example is distributed in the hope that it will be useful,
-               00010 ;;    but WITHOUT ANY WARRANTY; without even the implied warranty of
-               00011 ;;    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-               00012 ;;    GNU General Public License for more details.
-               00013 ;;
-               00014 ;;    You should have received a copy of the GNU General Public License
-               00015 ;;    along with gputils_make_example.  If not, see <http://www.gnu.org/licenses/>.
-               00016         variable        h
-  00000000     00017 h=0
-               00018         while   h < 6
-               00019 S#v(h)  equ     ~h
-               00020 h += 1
-               00021         endw
-  FFFFFFFF     00019 S#v(h)  equ     ~h
-  00000001     00020 h += 1
-  FFFFFFFE     00019 S#v(h)  equ     ~h
-  00000002     00020 h += 1
-  FFFFFFFD     00019 S#v(h)  equ     ~h
-  00000003     00020 h += 1
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  2
+               00004 
+               00005         extern          set_ports
+               00006         extern          greet
+               00007         extern          mv_rx_w
+               00008         extern          mv_w_tx
+               00009         extern          sipo
+               00010         extern          piso
+               00011         extern          loopback_sipo
+               00012         extern          loopback_piso
+               00013 
+               00014 start   code            H'0000'
+0000 2000      00015         call            set_ports
+0001 2800      00016         goto            main
+               00017 
+               00018         udata
+               00019 SIG     res             1
+               00020 
+               00021 prog    code
+0000 00022 main:
+               00023 ;;      Prompt bytes sent by Interface:
+               00024 ;;      Byte    Signal                  Function
+               00025 ;;      .13     Main Prompt             First prompt after greet
+               00026 ;;                                      This prompt indicates that Interface is ready to
+               00027 ;;                                      receive the selector signal from Control.
+               00028 ;;      .0      SIPO Prompt             Interface is ready to receive the number of bytes
+               00029 ;;                                      to be sent into SIPO (74595)
+               00030 ;;                                      If Control sends Interface a .0 here, Interface
+               00031 ;;                                      goes back to the Main Prompt.
+               00032 ;;      .1      SIPO byte Prompt        Interface is ready to receive the next byte to be
+               00033 ;;                                      pushed into the SIPO daisychain.
+               00034 ;;      .2      PISO Prompt             Interface is ready to receive the number of bytes
+               00035 ;;                                      to be sent to Control from PISO (74597)
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
-  FFFFFFFC     00019 S#v(h)  equ     ~h
-  00000004     00020 h += 1
-  FFFFFFFB     00019 S#v(h)  equ     ~h
-  00000005     00020 h += 1
-  FFFFFFFA     00019 S#v(h)  equ     ~h
-  00000006     00020 h += 1
-               00006 
-               00007         extern          set_ports
-               00008         extern          greet
-               00009         extern          mv_rx_w
-               00010         extern          mv_w_tx
-               00011         extern          sipo
-               00012         extern          piso
-               00013         extern          loopback_sipo
-               00014         extern          loopback_piso
-               00015 
-               00016 start   code            H'0000'
-0000 2000      00017         call            set_ports
-0001 2800      00018         goto            main
-               00019 
-               00020 prog    code
-0000 00021 main:
-0000 2000      00022         call            greet
-0001 00023 aa:
-0001 2800      00024         goto            aa
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  3
+               00036 ;;                                      If Control sends .0 to Interface, Interface goes
+               00037 ;;                                      back to Main Prompt
+               00038 ;;      .3      loopback PISO Prompt    Interface is ready to receive the number of bytes
+               00039 ;;                                      to be sent from Control to PISO for the loopback
+               00040 ;;                                      daisychain test.
+               00041 ;;                                      If Control sends .0, Interface goes back to the
+               00042 ;;                                      Main Prompt
+               00043 ;;      .4      lo PISO byte Prompt     Interface is ready to receive a byte to push into
+               00044 ;;                                      the PISO loopback daisychain.
+               00045 ;;                                      After receiving such a byte, Interface sends the
+               00046 ;;                                      byte popped from the other side of the daisychain
+               00047 ;;                                      to Control.
+               00048 ;;      .5      loopback SIPO Prompt    Interface is ready to receive the number of bytes
+               00049 ;;                                      to be sent from Control to SIPO for the loopback
+               00050 ;;                                      daisychain test.
+               00051 ;;                                      If Control sends .0, Interface goes back to the
+               00052 ;;                                      Main Prompt
+               00053 ;;      .6      lo SIPO byte Prompt     Interface is ready to receive a byte to push into
+               00054 ;;                                      the SIPO loopback daisychain.
+               00055 ;;                                      After receiving such byte, Interface sends the byte
+               00056 ;;                                      popped from the other side of the daisychain to
+               00057 ;;                                      Control.
+               00058 
+               00059 ;;      Bytes .7 through .12 are reserved for the greet subroutine
+               00060 ;;      From those, .7, .9 and .11 come from Interface
+               00061 ;;      whereas .8, .10 and .12 come from Control
+               00062 
+               00063 ;;      Command bytes sent by Control:
+               00064 ;;      Byte    Signal                  Function
+               00065 ;;      .14     Select PISO function    Request the PISO prompt from Interface.
+               00066 ;;                                      Presume .2 byte reply from Interface.
+               00067 ;;      .15     Select SIPO funciton    Request the SIPO prompt from Interface.
+               00068 ;;                                      Presume .0 byte reply from Interface.
+               00069 ;;      .16     Select lo PISO function Request loopback PISO prompt from Interface.
+               00070 ;;                                      Presume .3 byte reply from Interface.
+               00071 ;;      .17     Select lo SIPO function Request loopback SIPO prompt from Interface.
+               00072 ;;                                      Presume .5 byte reply from Interface.
+               00073 ;;      .18     Return to greet         Go back to greet subroutine, before ending a
+               00074 ;;                                      typical communications session.
+               00075 
+               00076 ;;      Argument bytes sent by Control:
+               00077 ;;      Byte    Signal                  Function
+               00078 ;;      x00     Exit from prompt        Exit from prompts...
+               00079 ;;                                              .0      SIPO Prompt
+               00080 ;;                                              .2      PISO Prompt
+               00081 ;;                                              .3      loopback PISO Prompt
+               00082 ;;                                              .5      loopback SIPO Prompt
+               00083 ;;                                      ...into the Main Prompt.
+               00084 ;;      x01-xFF Set number of bytes     Set amount of bytes when in prompts:
+               00085 ;;                                              .0      SIPO Prompt
+               00086 ;;                                              .2      PISO Prompt
+               00087 ;;                                              .3      loopback PISO Prompt
+               00088 ;;                                              .5      loopback SIPO Prompt
+               00089 ;;      x00-xFF Choose byte to push     Push byte from set {0x00-0xFF} when in prompts:
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+               00090 ;;                                              .1      SIPO byte prompt
+               00091 ;;                                              .4      lo PISO byte Prompt
+               00092 ;;                                              .6      lo SIPO byte Prompt
+               00093 
+0000 2000      00094         call            greet
+               00095 
+0001 00096 prompt13:
+0001 300D      00097         movlw           .13             ;;      << Main Prompt
+0002 2000      00098         call            mv_w_tx
+               00099 
+0003 2000      00100         call            mv_rx_w
+0004 0000 0000 00101         banksel         SIG
+0006 0080      00102         movwf           SIG
+0007 3A0E      00103         xorlw           .14
+0008 1D03      00104         skpz
+0009 2800      00105         goto            fi1
+               00106 ;;
+               00107 ;;      if SIGNAL == "Select PISO function" ; then
+               00108 ;;
+000A 2000      00109         call            piso            ;;      << Execute PISO session
+000B 2800      00110         goto            prompt13
+               00111 ;;
+               00112 ;;      fi
+               00113 ;;
+000C 00114 fi1:
+               00115 
+000C 0000 0000 00116         banksel         SIG
+000E 0800      00117         movfw           SIG
+000F 3A0F      00118         xorlw           .15
+0010 1D03      00119         skpz
+0011 2800      00120         goto            fi2
+               00121 ;;
+               00122 ;;      if SIGNAL == "Select SIPO function" ; then
+               00123 ;;
+0012 2000      00124         call            sipo            ;;      << Execute SIPO session
+0013 2800      00125         goto            prompt13
+               00126 ;;
+               00127 ;;      fi
+               00128 ;;
+0014 00129 fi2:
+               00130 
+0014 0000 0000 00131         banksel         SIG
+0016 0800      00132         movfw           SIG
+0017 3A10      00133         xorlw           .16
+0018 1D03      00134         skpz
+0019 2800      00135         goto            fi3
+               00136 ;;
+               00137 ;;      if SIGNAL == "Select loopback PISO function" ; then
+               00138 ;;
+001A 2000      00139         call            loopback_piso   ;;      << Execute loopback PISO session
+001B 2800      00140         goto            prompt13
+               00141 ;;
+               00142 ;;      fi
+               00143 ;;
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
+001C 00144 fi3:
+               00145 
+001C 0000 0000 00146         banksel         SIG
+001E 0800      00147         movfw           SIG
+001F 3A11      00148         xorlw           .17
+0020 1D03      00149         skpz
+0021 2800      00150         goto            fi4
+               00151 ;;
+               00152 ;;      if SIGNAL == "Select loopback SIPO function" ; then
+               00153 ;;
+0022 2000      00154         call            loopback_sipo   ;;      << Execute looback PISO session
+0023 2800      00155         goto            prompt13
+               00156 ;;
+               00157 ;;      fi
+               00158 ;;
+0024 00159 fi4:
+               00160 
+0024 0000 0000 00161         banksel         SIG
+0026 0800      00162         movfw           SIG
+0027 3A12      00163         xorlw           .18
+0028 1903      00164         skpnz
+               00165 ;;
+               00166 ;;      if SIGNAL == "Return to greet" ; then
+               00167 ;;
+0029 2800      00168         goto            main            ;;      << Go back to the start
+               00169 ;;
+               00170 ;;      fi
+               00171 ;;
+               00172 
+002A 30FF      00173         movlw           .255            ;;      << Send "Command not found" to Control
+002B 2000      00174         call            mv_w_tx
+               00175 
+002C 2800      00176         goto            prompt13
+               00177 
+002D 00178 aa:
+002D 2800      00179         goto            aa
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE  5
 
 
 SYMBOL TABLE
@@ -148,7 +279,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  4
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -208,7 +339,7 @@ EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
 EECON2                            0000018D
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  5
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -268,7 +399,7 @@ NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
 NOT_DONE                          00000001
 NOT_PD                            00000003
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  6
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -328,7 +459,7 @@ RABIF                             00000000
 RCIDL                             00000006
 RCIE                              00000005
 RCIF                              00000005
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  7
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -344,16 +475,11 @@ RX9                               00000006
 RX9D                              00000000
 R_W                               00000002
 S                                 00000003
-S0                                FFFFFFFF
-S1                                FFFFFFFE
-S2                                FFFFFFFD
-S3                                FFFFFFFC
-S4                                FFFFFFFB
-S5                                FFFFFFFA
 SBOREN                            00000004
 SCKP                              00000004
 SCS                               00000000
 SENB                              00000003
+SIG                               00000000
 SMP                               00000007
 SPBRG                             00000099
 SPBRGH                            0000009A
@@ -388,17 +514,17 @@ T0IE                              00000005
 T0IF                              00000002
 T0SE                              00000004
 T1CKPS0                           00000004
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  8
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
- 
 T1CKPS1                           00000005
 T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
 T1IE                              00000000
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
 T1IF                              00000000
 T1OSCEN                           00000003
 T2CKPS0                           00000000
@@ -448,17 +574,17 @@ TUN0                              00000000
 TUN1                              00000001
 TUN2                              00000002
 TUN3                              00000003
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE  9
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
- 
 TUN4                              00000004
 TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
 TXIE                              00000004
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
 TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
@@ -508,17 +634,17 @@ _EC_OSC                           00003FFB
 _EXTRC                            00003FFF
 _EXTRCIO                          00003FFE
 _EXTRC_OSC_CLKOUT                 00003FFF
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE 10
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
- 
 _EXTRC_OSC_NOCLKOUT               00003FFE
 _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
 _IESO_OFF                         00003BFF
+gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm3-2-2013  15:49:57           PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+ 
 _IESO_ON                          00003FFF
 _INTOSC                           00003FFD
 _INTOSCIO                         00003FFC
@@ -533,83 +659,21 @@ _WDT_OFF                          00003FF7
 _WDT_ON                           00003FFF
 _XT_OSC                           00003FF9
 __16F690                          00000001
-aa                                00000001
+aa                                0000002D
+fi1                               0000000C
+fi2                               00000014
+fi3                               0000001C
+fi4                               00000024
 greet                             00000000
-h                                 00000006
 loopback_piso                     00000000
 loopback_sipo                     00000000
 main                              00000000
 mv_rx_w                           00000000
 mv_w_tx                           00000000
 piso                              00000000
+prompt13                          00000001
 set_ports                         00000000
 sipo                              00000000
-C_ALIAS                           105
-C_ARG                             9
-C_AUTO                            1
-C_AUTOARG                         19
-C_BLOCK                           100
-C_EFCN                            0xff
-C_ENTAG                           15
-C_EOF                             107
-C_EOS                             102
-C_EXT                             2
-C_EXTDEF                          5
-C_FCN                             101
-C_FIELD                           18
-C_FILE                            103
-C_HIDDEN                          106
-C_LABEL                           6
-C_LASTENT                         20
-C_LINE                            104
-C_LIST                            108
-C_MOE                             16
-C_MOS                             8
-C_MOU                             11
-C_NULL                            0
-C_REG                             4
-gpasm-0.13.7 beta               src/bin/main_sipo_piso.asm2-23-2013  16:43:04          PAGE 11
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
- 
-C_REGPARM                         17
-C_SECTION                         109
-C_STAT                            3
-C_STRTAG                          10
-C_TPDEF                           13
-C_ULABEL                          7
-C_UNTAG                           12
-C_USTATIC                         14
-DT_ARY                            3
-DT_FCN                            2
-DT_NON                            0
-DT_PTR                            1
-N_ABS                             -1
-N_DEBUG                           -2
-N_SCNUM                           (null)
-N_UNDEF                           0
-SYMBOL_SIZE                       18
-T_CHAR                            2
-T_DOUBLE                          7
-T_ENUM                            10
-T_FLOAT                           6
-T_INT                             4
-T_LNGDBL                          16
-T_LONG                            5
-T_MOE                             11
-T_NULL                            0
-T_SHORT                           3
-T_SLONG                           17
-T_STRUCT                          8
-T_UCHAR                           12
-T_UINT                            14
-T_ULONG                           15
-T_UNION                           9
-T_USHORT                          13
-T_USLONG                          18
-T_VOID                            1
 
 
 Errors   :       0

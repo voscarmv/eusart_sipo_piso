@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  1
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -12,183 +12,187 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                00003 
                00004         extern          mv_rx_w
                00005         extern          mv_w_tx
-               00006 
-               00007         global          greet
-               00008 
-               00009         udata
-               00010 FLAGS   res             1
-               00011 GSIG    res             1
-               00012 
-               00013 libsp   code
-0000 00014 greet:
-               00015 ;;      Signals:
-               00016 ;;      Byte    Signal                  Function
-               00017 ;;      .7      Interface-distress      Send to Control, expect Control-response
-               00018 ;;      .8      Control-response        Send to Interface after receiving Interface-distress
-               00019 ;;                                      and expect Interface-confirm
-               00020 ;;      .9      Interface-confirm       Send to Control after receiving Control-response
-               00021 ;;      .10     Control-distress        Send to Interface, expect Interface-response
-               00022 ;;      .11     Interface-response      Send to Control after receiving Control-distress
-               00023 ;;                                      and expect Control-confirm
-               00024 ;;      .12     Control-confirm         Send to Interface after receiving Interface-response
-               00025 
-               00026 ;;      Flags:
-               00027 ;;      (All flags are set by default)
-               00028 ;;      Bit     Flag                    Function
-               00029 ;;      0       C_DISTRESS_PENDING      Interface is expecting Control-distress.
-               00030 ;;                                      Therefor: C_DISTRESS_PENDING = 1
-               00031 ;;                                      When Control-distress is received, this is unset.
-               00032 ;;      1       C_RESPONSE_PENDING      Interface-distress was sent AND received by Control,
-               00033 ;;                                      Interface is now expecting a Control-response signal
-               00034 ;;                                      Therefor: C_RESPONSE_PENDING = 1
-               00035 ;;                                      When Control-response is received, this is unset.
-               00036 ;;      2       C_CONFIRM_PENDING       Control-distress was received and responded by
-               00037 ;;                                      Interface with an Interface-response. Interface
-               00038 ;;                                      is therefor expecting a Control-confirm.
-               00039 ;;                                      Therefor: C_CONFIRM_PENDING = 1
-               00040 ;;                                      When Control-confirm is received, this is unset.
-               00041 ;;      3       ITX_IRX                 Interface-distress was sent and Control-response
-               00042 ;;                                      was received in exchange. Interface-confirm will be
-               00043 ;;                                      sent to Control.
-               00044 ;;                                      Therefor: ITX_IRX = 0
-               00045 ;;                                      Otherwise, this is set.
-               00046 ;;      4       CTX_CRX                 Control-distress was received and responded with
-               00047 ;;                                      Interface-response by Interface. Then, Control
-               00048 ;;                                      sent Control-confirm and Interface received this.
-               00049 ;;                                      Therefor: CTX_CRX = 0
-               00050 ;;                                      Otherwise, this is set.
-               00051 
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  2
+               00006         extern          delay
+               00007 
+               00008         global          greet
+               00009 
+               00010         udata
+               00011 FLAGS   res             1
+               00012 GSIG    res             1
+               00013 
+               00014 libsp   code
+0000 00015 greet:
+               00016 ;;      Signals:
+               00017 ;;      Byte    Signal                  Function
+               00018 ;;      .7      Interface-distress      Send to Control, expect Control-response
+               00019 ;;      .8      Control-response        Send to Interface after receiving Interface-distress
+               00020 ;;                                      and expect Interface-confirm
+               00021 ;;      .9      Interface-confirm       Send to Control after receiving Control-response
+               00022 ;;      .10     Control-distress        Send to Interface, expect Interface-response
+               00023 ;;      .11     Interface-response      Send to Control after receiving Control-distress
+               00024 ;;                                      and expect Control-confirm
+               00025 ;;      .12     Control-confirm         Send to Interface after receiving Interface-response
+               00026 
+               00027 ;;      Flags:
+               00028 ;;      (All flags are set by default)
+               00029 ;;      Bit     Flag                    Function
+               00030 ;;      0       C_DISTRESS_PENDING      Interface is expecting Control-distress.
+               00031 ;;                                      Therefor: C_DISTRESS_PENDING = 1
+               00032 ;;                                      When Control-distress is received, this is unset.
+               00033 ;;      1       C_RESPONSE_PENDING      Interface-distress was sent AND received by Control,
+               00034 ;;                                      Interface is now expecting a Control-response signal
+               00035 ;;                                      Therefor: C_RESPONSE_PENDING = 1
+               00036 ;;                                      When Control-response is received, this is unset.
+               00037 ;;      2       C_CONFIRM_PENDING       Control-distress was received and responded by
+               00038 ;;                                      Interface with an Interface-response. Interface
+               00039 ;;                                      is therefor expecting a Control-confirm.
+               00040 ;;                                      Therefor: C_CONFIRM_PENDING = 1
+               00041 ;;                                      When Control-confirm is received, this is unset.
+               00042 ;;      3       ITX_IRX                 Interface-distress was sent and Control-response
+               00043 ;;                                      was received in exchange. Interface-confirm will be
+               00044 ;;                                      sent to Control.
+               00045 ;;                                      Therefor: ITX_IRX = 0
+               00046 ;;                                      Otherwise, this is set.
+               00047 ;;      4       CTX_CRX                 Control-distress was received and responded with
+               00048 ;;                                      Interface-response by Interface. Then, Control
+               00049 ;;                                      sent Control-confirm and Interface received this.
+               00050 ;;                                      Therefor: CTX_CRX = 0
+               00051 ;;                                      Otherwise, this is set.
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
-               00052 ;;      It can be said that ITX_IRX=0 only when C_RESPONSE_PENDING is 0, and
-               00053 ;;      CTX_CRX=0 only when C_DISTRESS_PENDING = C_CONFIRM_PENDING = 0
-               00054 
-               00055 ;;      Set flags
-0000 0000 0000 00056         banksel         FLAGS
-0002 301F      00057         movlw           B'00011111'
-0003 0000 0000 00058         banksel         FLAGS
-0005 0080      00059         movwf           FLAGS
-               00060 
-               00061 ;;      Break loop
-0006 00062 break:
-0006 0000 0000 00063         banksel         FLAGS
-0008 0800      00064         movfw           FLAGS
-0009 3A00      00065         xorlw           .0
-000A 1903      00066         skpnz
-000B 2800      00067         goto            finish
-               00068 
-               00069 ;;      Transmission
-000C 00070 transmit:
-000C 0000 0000 00071         banksel         FLAGS
-000E 1C80      00072         btfss           FLAGS,1
-000F 2800      00073         goto            else1
-               00074 ;;
-               00075 ;;      if C_RESPONSE_PENDING (FLAGS,1) == 1 ; then
-               00076 ;;
-0010 3007      00077         movlw           .7              ;;      << Send Interface-distress
-0011 2000      00078         call            mv_w_tx
-               00079         .direct         "c","Control.rx"
-0012 2800      00080         goto            fi1
-               00081 ;;
-               00082 ;;      else
+               00052 
+               00053 ;;      It can be said that ITX_IRX=0 only when C_RESPONSE_PENDING is 0, and
+               00054 ;;      CTX_CRX=0 only when C_DISTRESS_PENDING = C_CONFIRM_PENDING = 0
+               00055 
+               00056 ;;      Set flags
+0000 0000 0000 00057         banksel         FLAGS
+0002 301F      00058         movlw           B'00011111'
+0003 0000 0000 00059         banksel         FLAGS
+0005 0080      00060         movwf           FLAGS
+               00061 
+               00062 ;;      Break loop
+0006 00063 break:
+0006 0000 0000 00064         banksel         FLAGS
+0008 0800      00065         movfw           FLAGS
+0009 3A00      00066         xorlw           .0
+000A 1903      00067         skpnz
+000B 2800      00068         goto            finish
+               00069 
+               00070 ;;      Transmission
+000C 00071 transmit:
+000C 0000 0000 00072         banksel         FLAGS
+000E 1C80      00073         btfss           FLAGS,1
+000F 2800      00074         goto            else1
+               00075 ;;
+               00076 ;;      if C_RESPONSE_PENDING (FLAGS,1) == 1 ; then
+               00077 ;;
+0010 2000      00078         call            delay
+0011 3007      00079         movlw           .7              ;;      << Send Interface-distress
+0012 2000      00080         call            mv_w_tx
+               00081         .direct         "c","Control.rx"
+0013 2800      00082         goto            fi1
                00083 ;;
-0013 00084 else1:
-0013 3009      00085         movlw           .9              ;;      << Send Interface-confirm
-0014 2000      00086         call            mv_w_tx
-               00087         .direct         "c","Control.rx"
-               00088 ;;
-               00089 ;;      fi
-               00090 ;;
-0015 00091 fi1:
-               00092 
-0015 0000 0000 00093         banksel         FLAGS
-0017 0800      00094         movfw           FLAGS
-0018 3905      00095         andlw           B'00000101'
-0019 3A04      00096         xorlw           B'00000100'
-001A 1D03      00097         skpz
-001B 2800      00098         goto            fi2
-               00099 ;;
-               00100 ;;      if C_DISTRESS_PENDING (FLAGS,0) == 0 && C_CONFIRM_PENDING (FLAGS,2) == 1 ; then
-               00101 ;;
-001C 300B      00102         movlw           .11             ;;      << Send Interface-response
-001D 2000      00103         call            mv_w_tx
-               00104         .direct         "c","Control.rx"
-               00105 ;;
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  3
+               00084 ;;      else
+               00085 ;;
+0014 00086 else1:
+0014 2000      00087         call            delay
+0015 3009      00088         movlw           .9              ;;      << Send Interface-confirm
+0016 2000      00089         call            mv_w_tx
+               00090         .direct         "c","Control.rx"
+               00091 ;;
+               00092 ;;      fi
+               00093 ;;
+0017 00094 fi1:
+               00095 
+0017 0000 0000 00096         banksel         FLAGS
+0019 0800      00097         movfw           FLAGS
+001A 3905      00098         andlw           B'00000101'
+001B 3A04      00099         xorlw           B'00000100'
+001C 1D03      00100         skpz
+001D 2800      00101         goto            fi2
+               00102 ;;
+               00103 ;;      if C_DISTRESS_PENDING (FLAGS,0) == 0 && C_CONFIRM_PENDING (FLAGS,2) == 1 ; then
+               00104 ;;
+001E 2000      00105         call            delay
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
-               00106 ;;      fi
-               00107 ;;
-001E 00108 fi2:
-               00109 
-               00110 ;;      Sample RX byte
-001E 00111 sample:
-               00112         .direct         "c","Control.tx=8"
-001E 1283 1303 00113         banksel         PIR1
-0020 1E8C      00114         btfss           PIR1,5
-0021 2800      00115         goto            break
-               00116 
-               00117 ;;      Reception
-0022 00118 receive:
-0022 2000      00119         call            mv_rx_w
-0023 0000 0000 00120         banksel         GSIG
-0025 0080      00121         movwf           GSIG
-0026 3A0A      00122         xorlw           .10
-0027 1903      00123         skpnz
-               00124 ;;
-               00125 ;;      if SIGNAL == Control-distress ; then
-               00126 ;;
-               00127         .direct         "c","Control.tx"
-0028 1000      00128         bcf             FLAGS,0         ;;      << Clear C_DISTRESS_PENDING
-               00129 ;;
-               00130 ;;      fi
-               00131 ;;
-               00132 
-0029 0800      00133         movfw           GSIG
-002A 3A08      00134         xorlw           .8
-002B 1D03      00135         skpz
-002C 2800      00136         goto            fi3
-               00137 ;;
-               00138 ;;      if SIGNAL == Control-response ; then
-               00139 ;;
-002D 1080      00140         bcf             FLAGS,1         ;;      << Clear C_RESPONSE_PENDING
-002E 1180      00141         bcf             FLAGS,3         ;;      << Clear ITX_IRX
-               00142 ;;
-               00143 ;;      fi
-               00144 ;;
-002F 00145 fi3:
-               00146 
-002F 0800      00147         movfw           GSIG
-0030 3A0C      00148         xorlw           .12
-0031 1D03      00149         skpz
-0032 2800      00150         goto            fi4
-               00151 ;;
-               00152 ;;      if SIGNAL == Control-confirm ; then
-               00153 ;;
-0033 1100      00154         bcf             FLAGS,2         ;;      << Clear C_CONFIRM_PENDING
-0034 1200      00155         bcf             FLAGS,4         ;;      << Clear CTX_CRX
-               00156 ;;
-               00157 ;;      fi
-               00158 ;;
-0035 00159 fi4:
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  4
+001F 300B      00106         movlw           .11             ;;      << Send Interface-response
+0020 2000      00107         call            mv_w_tx
+               00108         .direct         "c","Control.rx"
+               00109 ;;
+               00110 ;;      fi
+               00111 ;;
+0021 00112 fi2:
+               00113 
+               00114 ;;      Sample RX byte
+0021 00115 sample:
+               00116         .direct         "c","Control.tx=8"
+0021 1283 1303 00117         banksel         PIR1
+0023 1E8C      00118         btfss           PIR1,5
+0024 2800      00119         goto            break
+               00120 
+               00121 ;;      Reception
+0025 00122 receive:
+0025 2000      00123         call            mv_rx_w
+0026 0000 0000 00124         banksel         GSIG
+0028 0080      00125         movwf           GSIG
+0029 3A0A      00126         xorlw           .10
+002A 1903      00127         skpnz
+               00128 ;;
+               00129 ;;      if SIGNAL == Control-distress ; then
+               00130 ;;
+               00131         .direct         "c","Control.tx"
+002B 1000      00132         bcf             FLAGS,0         ;;      << Clear C_DISTRESS_PENDING
+               00133 ;;
+               00134 ;;      fi
+               00135 ;;
+               00136 
+002C 0800      00137         movfw           GSIG
+002D 3A08      00138         xorlw           .8
+002E 1D03      00139         skpz
+002F 2800      00140         goto            fi3
+               00141 ;;
+               00142 ;;      if SIGNAL == Control-response ; then
+               00143 ;;
+0030 1080      00144         bcf             FLAGS,1         ;;      << Clear C_RESPONSE_PENDING
+0031 1180      00145         bcf             FLAGS,3         ;;      << Clear ITX_IRX
+               00146 ;;
+               00147 ;;      fi
+               00148 ;;
+0032 00149 fi3:
+               00150 
+0032 0800      00151         movfw           GSIG
+0033 3A0C      00152         xorlw           .12
+0034 1D03      00153         skpz
+0035 2800      00154         goto            fi4
+               00155 ;;
+               00156 ;;      if SIGNAL == Control-confirm ; then
+               00157 ;;
+0036 1100      00158         bcf             FLAGS,2         ;;      << Clear C_CONFIRM_PENDING
+0037 1200      00159         bcf             FLAGS,4         ;;      << Clear CTX_CRX
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
-               00160 
-0035 2800      00161         goto            break
-0036 00162 finish:
-0036 0008      00163         return
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  5
+               00160 ;;
+               00161 ;;      fi
+               00162 ;;
+0038 00163 fi4:
+               00164 
+0038 2800      00165         goto            break
+0039 00166 finish:
+0039 0008      00167         return
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE  5
 
 
 SYMBOL TABLE
@@ -247,7 +251,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  6
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -307,7 +311,7 @@ EEADR                             0000010D
 EEADRH                            0000010F
 EECON1                            0000018C
 EECON2                            0000018D
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  7
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -367,7 +371,7 @@ MSK                               00000093
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  8
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -427,7 +431,7 @@ R                                 00000002
 RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE  9
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -487,7 +491,7 @@ T1CKPS1                           00000005
 T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE 10
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -547,7 +551,7 @@ TUN4                              00000004
 TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE 11
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -607,7 +611,7 @@ _EXTRC_OSC_NOCLKOUT               00003FFE
 _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
-gpasm-0.13.7 beta               ./src/lib/greet.asm2-23-2013  17:31:35          PAGE 12
+gpasm-0.13.7 beta               ./src/lib/greet.asm3-2-2013  19:42:23           PAGE 12
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -629,17 +633,18 @@ _WDT_ON                           00003FFF
 _XT_OSC                           00003FF9
 __16F690                          00000001
 break                             00000006
-else1                             00000013
-fi1                               00000015
-fi2                               0000001E
-fi3                               0000002F
-fi4                               00000035
-finish                            00000036
+delay                             00000000
+else1                             00000014
+fi1                               00000017
+fi2                               00000021
+fi3                               00000032
+fi4                               00000038
+finish                            00000039
 greet                             00000000
 mv_rx_w                           00000000
 mv_w_tx                           00000000
-receive                           00000022
-sample                            0000001E
+receive                           00000025
+sample                            00000021
 transmit                          0000000C
 
 

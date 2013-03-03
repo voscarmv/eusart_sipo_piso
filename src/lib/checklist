@@ -1,7 +1,8 @@
 libsp.a
 Serial-parallel communications library for the PIC16F690
 
-	greet.asm
+X	greet.asm
+		delay.asm
 X	clear_sipo.asm
 X	clear_piso.asm
 X	set_ports.asm

@@ -19,6 +19,7 @@ src_incdir = ./src/include
 
 objects := \
 	${libdir}/greet.o \
+		${libdir}/delay.o \
 	${libdir}/clear_sipo.o \
 	${libdir}/clear_piso.o \
 	${libdir}/set_ports.o \

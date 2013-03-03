@@ -44,13 +44,13 @@ i = 8
 	btfss		TOSIPO,i-1
 	bcf		PORTA,5
 
-	bsf		PORTA,4
-	bcf		PORTA,4
-
 	btfsc		PORTA,3
 	bsf		FRSIPO,i-1
 	btfss		PORTA,3
 	bcf		FRSIPO,i-1
+
+	bsf		PORTA,4
+	bcf		PORTA,4
 
 i -= 1
 	endw

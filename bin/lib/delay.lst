@@ -1,4 +1,4 @@
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm3-2-2013  16:29:31           PAGE  1
+gpasm-0.13.7 beta               ./src/lib/delay.asm3-2-2013  19:43:38           PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -10,55 +10,30 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                00002 ; P16F690.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
                00607         LIST
                00003 
-               00004         global          loopback_piso
+               00004         global          delay
                00005 
-               00006         extern          load_piso
-               00007         extern          clear_piso
-               00008 ;;
-               00009 ;;      Remove following after test
-               00010 ;;      extern          load_piso
-               00011 ;;
-               00012         extern          mv_w_tx
-               00013         extern          mv_rx_w
-               00014         extern          push_w_piso
-               00015         extern          pop_piso_w
-               00016 
-               00017         udata
-               00018 COUNT   res             1
-               00019 
-               00020 libsp   code
-0000 00021 loopback_piso:
-0000 3003      00022         movlw           .3              ;;      << Prompt
-0001 2000      00023         call            mv_w_tx
-               00024         .direct         "c","Control.rx"
-               00025         .direct         "c","Control.tx = 0x03"
-0002 2000      00026         call            mv_rx_w
-0003 0080      00027         movwf           COUNT
-0004 3A00      00028         xorlw           .0
-0005 1903      00029         skpnz
-0006 2800      00030         goto            finish
-0007 2000      00031         call            load_piso
-0008 2000      00032         call            clear_piso
-               00033 ;;      The following instruction simulates the clear_piso
-               00034 ;;      function for the ttl165 model of gpsim, but must
-               00035 ;;      be removed upon test completion:
-               00036 ;;      call            load_piso
-0009 00037 push:
-0009 3004      00038         movlw           .4              ;;      << Prompt
-000A 2000      00039         call            mv_w_tx
-               00040         .direct         "c","Control.rx"
-               00041         .direct         "c","Control.tx = 0xF7"
-000B 2000      00042         call            mv_rx_w
-000C 2000      00043         call            push_w_piso
-000D 2000      00044         call            pop_piso_w
-000E 2000      00045         call            mv_w_tx
-000F 0000 0000 00046         banksel         COUNT
-0011 0B80      00047         decfsz          COUNT,1
-0012 2800      00048         goto            push
-0013 2800      00049         goto            loopback_piso
-0014 00050 finish:
-0014 0008      00051         return
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm3-2-2013  16:29:31           PAGE  2
+               00006         udata
+               00007 CTR1    res             1
+               00008 CTR2    res             1
+               00009 
+               00010 libsp   code
+0000 00011 delay:
+0000 0000 0000 00012         banksel         CTR1
+0002 30FF      00013         movlw           .255
+0003 0080      00014         movwf           CTR1
+0004 3003      00015         movlw           .3
+0005 0080      00016         movwf           CTR2
+0006 00017 loop1:
+0006 0B80      00018         decfsz          CTR1,1
+0007 2800      00019         goto            loop2
+0008 2800      00020         goto            finish
+0009 00021 loop2:
+0009 0B80      00022         decfsz          CTR2,1
+000A 2800      00023         goto            loop2
+000B 2800      00024         goto            loop1
+000C 00025 finish:
+000C 0008      00026         return
+gpasm-0.13.7 beta               ./src/lib/delay.asm3-2-2013  19:43:38           PAGE  2
 
 
 SYMBOL TABLE
@@ -117,7 +92,7 @@ C1CH0                             00000000
 C1CH1                             00000001
 C1IE                              00000005
 C1IF                              00000005
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm3-2-2013  16:29:31           PAGE  3
+gpasm-0.13.7 beta               ./src/lib/delay.asm3-2-2013  19:43:38           PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -160,9 +135,10 @@ CKP                               00000004
 CM1CON0                           00000119
 CM2CON0                           0000011A
 CM2CON1                           0000011B
-COUNT                             00000000
 CREN                              00000004
 CSRC                              00000007
+CTR1                              00000000
+CTR2                              00000001
 D                                 00000005
 DATA_ADDRESS                      00000005
 DC                                00000001
@@ -176,13 +152,13 @@ ECCPAS2                           00000006
 ECCPASE                           00000007
 EEADR                             0000010D
 EEADRH                            0000010F
-EECON1                            0000018C
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm3-2-2013  16:29:31           PAGE  4
+gpasm-0.13.7 beta               ./src/lib/delay.asm3-2-2013  19:43:38           PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+EECON1                            0000018C
 EECON2                            0000018D
 EEDAT                             0000010C
 EEDATA                            0000010C
@@ -236,13 +212,13 @@ MSK                               00000093
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
-NOT_DONE                          00000001
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm3-2-2013  16:29:31           PAGE  5
+gpasm-0.13.7 beta               ./src/lib/delay.asm3-2-2013  19:43:38           PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+NOT_DONE                          00000001
 NOT_PD                            00000003
 NOT_POR                           00000001
 NOT_RABPU                         00000007
@@ -296,13 +272,13 @@ R                                 00000002
 RABIE                             00000003
 RABIF                             00000000
 RCIDL                             00000006
-RCIE                              00000005
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm3-2-2013  16:29:31           PAGE  6
+gpasm-0.13.7 beta               ./src/lib/delay.asm3-2-2013  19:43:38           PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+RCIE                              00000005
 RCIF                              00000005
 RCREG                             0000001A
 RCSTA                             00000018
@@ -356,13 +332,13 @@ T1CKPS1                           00000005
 T1CON                             00000010
 T1GINV                            00000007
 T1GSS                             00000001
-T1IE                              00000000
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm3-2-2013  16:29:31           PAGE  7
+gpasm-0.13.7 beta               ./src/lib/delay.asm3-2-2013  19:43:38           PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+T1IE                              00000000
 T1IF                              00000000
 T1OSCEN                           00000003
 T2CKPS0                           00000000
@@ -416,13 +392,13 @@ TUN4                              00000004
 TX9                               00000006
 TX9D                              00000000
 TXEN                              00000005
-TXIE                              00000004
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm3-2-2013  16:29:31           PAGE  8
+gpasm-0.13.7 beta               ./src/lib/delay.asm3-2-2013  19:43:38           PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+TXIE                              00000004
 TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
@@ -476,13 +452,13 @@ _EXTRC_OSC_NOCLKOUT               00003FFE
 _FCMEN_OFF                        000037FF
 _FCMEN_ON                         00003FFF
 _HS_OSC                           00003FFA
-_IESO_OFF                         00003BFF
-gpasm-0.13.7 beta               ./src/lib/loopback_piso.asm3-2-2013  16:29:31           PAGE  9
+gpasm-0.13.7 beta               ./src/lib/delay.asm3-2-2013  19:43:38           PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
  
+_IESO_OFF                         00003BFF
 _IESO_ON                          00003FFF
 _INTOSC                           00003FFD
 _INTOSCIO                         00003FFC
@@ -497,15 +473,10 @@ _WDT_OFF                          00003FF7
 _WDT_ON                           00003FFF
 _XT_OSC                           00003FF9
 __16F690                          00000001
-clear_piso                        00000000
-finish                            00000014
-load_piso                         00000000
-loopback_piso                     00000000
-mv_rx_w                           00000000
-mv_w_tx                           00000000
-pop_piso_w                        00000000
-push                              00000009
-push_w_piso                       00000000
+delay                             00000000
+finish                            0000000C
+loop1                             00000006
+loop2                             00000009
 
 
 Errors   :       0
