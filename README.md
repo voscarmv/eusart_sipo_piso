@@ -1,7 +1,7 @@
 # UNIX terminal to 5V interface
 > A simple Serial-In-Parallel-Out / Parallel-In-Serial-Out USB to 5V TTL interface for Microchip's PIC16F690 Micro-controller.
 
-You can watch the [YouTube video](https://www.youtube.com/watch?v=46WZUcRUPEI) of this project for a full demonstrarion of this project.
+You can watch the [YouTube video](https://www.youtube.com/watch?v=46WZUcRUPEI) of this project for a full demonstrarion.
 
 [![](header.png)](https://www.youtube.com/watch?v=46WZUcRUPEI)
 
@@ -22,7 +22,7 @@ make
 
 ## Usage example
 
-Check out the YouTube video for a full usage example.
+Check out the [YouTube video](https://www.youtube.com/watch?v=46WZUcRUPEI) for a full usage example.
 
 Use the following command to run a gpsim simulation:
 
