@@ -55,7 +55,7 @@ NOTE: You will need a [PICKIT2](https://www.microchip.com/DevelopmentTools/Produ
 
 Contributions, issues and feature requests are welcome!
 
-Feel free to check the [issues page](./issues/).
+Feel free to check the [issues page](../issues/).
 
 ## Show your support
 
