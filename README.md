@@ -35,7 +35,6 @@ You will also need [PK2CMD](https://github.com/psmay/pk2cmd) from Microchip. Mak
 Use these commands to program, start, stop or erase the PIC16F690 respectively:
 
 ```sh
-make sim
 make prog
 make start
 make stop
