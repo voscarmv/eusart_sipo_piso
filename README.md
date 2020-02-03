@@ -9,7 +9,7 @@ This repository contains the code you'll need to load to your PIC microcontrolle
 
 You can then use these 5V terminals to control real-life devices such as relays or other 5V digital circuitry.
 
-I made this project bakc in college and my purpose was to replace as much of the closed-source software we used from Microchip as I could with Open Source alternatives.
+I made this project back in college and my purpose was to replace as much of the closed-source software we used from Microchip as I could with Open Source alternatives.
 
 ## Installation
 
