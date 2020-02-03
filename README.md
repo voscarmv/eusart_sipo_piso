@@ -29,6 +29,9 @@ Use the following command to run a [gpsim](http://gpsim.sourceforge.net/) simula
 ```sh
 make sim
 ```
+
+You will also need [PK2CMD](https://github.com/psmay/pk2cmd) from Microchip. Make sure you follow the installation instructions from their website before you try to use this project!
+
 Use these commands to program, start, stop or erase the PIC16F690 respectively:
 
 ```sh
@@ -38,6 +41,8 @@ make start
 make stop
 make erase
 ```
+
+NOTE: You will need a [PICKIT2](https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/PG164120) and a [PIC16F690](https://www.microchip.com/wwwproducts/en/PIC16F690) to be able to use these commands.
 
 ## Contact info
 
