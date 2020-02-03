@@ -1,7 +1,7 @@
 # UNIX terminal to 5V interface
 > A simple Serial-In-Parallel-Out / Parallel-In-Serial-Out USB to 5V TTL interface for Microchip's PIC16F690 Micro-controller.
 
-You can watch the [YouTube video](https://www.youtube.com/watch?v=46WZUcRUPEI) of this project for a full demonstrarion.
+You can watch the [YouTube video](https://www.youtube.com/watch?v=46WZUcRUPEI) of this project for a full demonstration.
 
 [![](header.png)](https://www.youtube.com/watch?v=46WZUcRUPEI)
 
